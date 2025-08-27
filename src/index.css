@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Premium AI Tools Design System */
+
+@layer base {
+  :root {
+    /* Light theme with premium purple brand */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+
+    /* Brand primary - purple #6d33ff */
+    --primary: 258 100% 60%;
+    --primary-foreground: 0 0% 98%;
+    --primary-glow: 258 100% 70%;
+    --primary-light: 258 100% 95%;
+
+    /* Premium secondary - light purple */
+    --secondary: 258 30% 96%;
+    --secondary-foreground: 258 100% 60%;
+
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+
+    /* Accent - complementary purple */
+    --accent: 258 30% 96%;
+    --accent-foreground: 258 100% 60%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 258 100% 60%;
+
+    /* Premium gradients with brand colors */
+    --gradient-primary: linear-gradient(135deg, hsl(258 100% 60%), hsl(280 100% 70%));
+    --gradient-hero: linear-gradient(135deg, hsl(258 100% 98%) 0%, hsl(258 30% 96%) 100%);
+    --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(255,255,255,0.4));
+    --gradient-purple-light: linear-gradient(135deg, hsl(258 100% 95%), hsl(280 100% 98%));
+    
+    /* Premium shadows with brand colors */
+    --shadow-glow: 0 0 40px hsl(258 100% 60% / 0.2);
+    --shadow-primary: 0 10px 30px -10px hsl(258 100% 60% / 0.3);
+    --shadow-card: 0 8px 32px hsl(258 100% 60% / 0.1);
+    --shadow-soft: 0 4px 20px hsl(258 100% 60% / 0.08);
+    --shadow-premium: 0 20px 60px hsl(258 100% 60% / 0.15);
+    
+    /* Premium borders */
+    --border-gradient: linear-gradient(135deg, hsl(258 100% 60%), hsl(280 100% 70%));
+    --border-glow: 0 0 20px hsl(258 100% 60% / 0.3);
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 258 100% 60%;
+    --primary-foreground: 240 10% 3.9%;
+
+    --secondary: 258 50% 25%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+
+    --accent: 258 50% 25%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 258 100% 60%;
+    
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 258 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 258 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@layer components {
+  /* Premium Light Theme Components */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  .card-gradient {
+    background: var(--gradient-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(258 100% 60% / 0.1);
+  }
+  
+  .primary-gradient {
+    background: var(--gradient-primary);
+  }
+  
+  .purple-light-gradient {
+    background: var(--gradient-purple-light);
+  }
+  
+  .glow-effect {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .card-shadow {
+    box-shadow: var(--shadow-card);
+  }
+  
+  .soft-shadow {
+    box-shadow: var(--shadow-soft);
+  }
+  
+  .primary-shadow {
+    box-shadow: var(--shadow-primary);
+  }
+  
+  .premium-shadow {
+    box-shadow: var(--shadow-premium);
+  }
+  
+  /* Premium card hover effects */
+
+  /* Premium animations */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite alternate;
+  }
+  
+  .animate-slide-up {
+    animation: slide-up 0.6s ease-out;
+  }
+  
+  .animate-scale-bounce {
+    animation: scale-bounce 0.5s ease-out;
+  }
+  
+  .animate-premium-hover {
+    animation: premium-hover 0.5s ease;
+  }
+  
+  /* Section spacing utilities */
+  .section-spacing {
+    @apply py-20 relative;
+  }
+  
+  .section-divider {
+    @apply h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-16;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-0.5deg); }
+  }
+  
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 20px hsl(258 100% 60% / 0.2); }
+    100% { box-shadow: 0 0 40px hsl(258 100% 60% / 0.4); }
+  }
+  
+  @keyframes slide-up {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes scale-bounce {
+    0% { transform: scale(0.9); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  @keyframes premium-hover {
+    0% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.02) translateY(-2px); }
+    100% { transform: scale(1.05) translateY(-8px); }
+  }
+}
