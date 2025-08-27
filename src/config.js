@@ -9,19 +9,19 @@ export const GRAPH_BASE = "https://graph.facebook.com/v6.0";
 
 let SERVER_IP_URL;
 
-let SERVER_IP_URL1 = "http://localhost:3000/api";
+let SERVER_IP_URL1 = "https://api.topaitools.ai/api";
 
 if (typeof window !== "undefined") {
   if (window.location.hostname === "localhost") {
     SERVER_IP_URL = "https://localhost:8443/api";
     // SERVER_IP_URL1 = "http://localhost:2020/api";
     // SERVER_IP_URL = "http://65.1.82.82:8080/focusnextrestservices/api";
-    SERVER_IP_URL = "http://localhost:3000/api";
-    SERVER_IP_URL1 = "http://localhost:3000/api";
+    SERVER_IP_URL = "https://api.topaitools.ai/api";
+    SERVER_IP_URL1 = "https://api.topaitools.ai/api";
   } else {
-    SERVER_IP_URL1 = "http://localhost:3000/api";
+    SERVER_IP_URL1 = "https://api.topaitools.ai/api";
     // SERVER_IP_URL = "http://65.1.82.82:8080/focusnextrestservices/api";
-    SERVER_IP_URL = "http://localhost:3000/api";
+    SERVER_IP_URL = "https://api.topaitools.ai/api";
   }
 }
 const MIXPANEL_ID1 = "ef8786e1b4be644396cef0543f380841";
