@@ -122,7 +122,7 @@ const AINews = () => {
                               </Badge>
                               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                                 <Clock className="h-4 w-4" />
-                                {formatTimeAgo(item.publishDate)}
+                                {formatTimeAgo(item.createdAt)}
                               </div>
                             </div>
 
@@ -207,7 +207,7 @@ const AINews = () => {
                           <div className="flex items-center gap-2">
                             <span>{item.source}</span>
                             <span>•</span>
-                            <span>{formatTimeAgo(item.publishDate)}</span>
+                            <span>{formatTimeAgo(item.createdAt)}</span>
                           </div>
                           <span>{item.readTime}</span>
                         </div>
@@ -259,7 +259,7 @@ const AINews = () => {
                             )}
                             <div className="flex items-center gap-1 text-sm text-muted-foreground">
                               <Clock className="h-4 w-4" />
-                              {formatTimeAgo(item.publishDate)}
+                              {formatTimeAgo(item.createdAt)}
                             </div>
                           </div>
 
@@ -281,7 +281,10 @@ const AINews = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               <span>{item.source}</span>
-                              <span>by {item.author}</span>
+                              {item.authorBy && (
+                                <span>by {item.authorBy}</span>
+                              )}
+                             
                               <span>{item.readTime}</span>
                             </div>
 

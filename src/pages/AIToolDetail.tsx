@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import RightSidebar from '@/components/RightSidebar';
-import { fetchAIToolDetails } from "../store/features/contents/contentsSlice";
+import { fetchAIToolDetails, fetchAITools } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -37,14 +37,20 @@ const AIToolDetail = () => {
   const { toast } = useToast();
 
 
-  const {  cDetails, aiCategories } = useAppSelector(
+  const {  cDetails, aiCategories , aiTools} = useAppSelector(
     (state: any) => state.content
   );
 console.log("cDetails", cDetails);
  useEffect(() => {
     dispatch(fetchAIToolDetails(id));
+       const jsonObj = { page: 1, limit: 50 };
+        dispatch(fetchAITools(jsonObj));
   }, []);
-
+  useEffect(() => {
+    dispatch(fetchAIToolDetails(id));
+       const jsonObj = { page: 1, limit: 50 };
+        dispatch(fetchAITools(jsonObj));
+  }, [id]);
 
 
   // Similar tools data
@@ -98,12 +104,12 @@ console.log("cDetails", cDetails);
             </div>
 
             {/* Tool Header */}
-            <Card className="mb-8 hover:border-primary hover:shadow-2xl hover:scale-105 transition-all duration-500">
+            <Card className="mb-8 hover:border-primary hover:shadow-2xl-111 hover:scale-105-111 transition-all-111 duration-500-111">
               <CardContent className="p-8">
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="flex-1">
                     <div className="flex items-start gap-4 mb-6">
-                      <div className="text-6xl"><img src={cDetails.logo} /> </div>
+                      <div className="text-6xl logo-image"><img src={cDetails.logo} /> </div>
                       <div className="flex-1">
                         <h1 className="text-4xl font-bold mb-2">{cDetails.name}</h1>
                         <p className="text-xl text-muted-foreground mb-4">{cDetails.tagline}</p>
@@ -129,10 +135,10 @@ console.log("cDetails", cDetails);
                         </div>
                       </div>
                     </div>
-                    
+                        
                     <p className="text-muted-foreground leading-relaxed mb-6">
                      
-
+                   <a target='_blank' href={cDetails.toolUrl} className="underline hover:text-primary transition-colors">    <img src={cDetails.bannerImage} alt={cDetails.name} className="w-full h-auto mb-4 rounded-lg" />  </a>
                       <p
                                   dangerouslySetInnerHTML={{
                                     __html: cDetails.overview,
@@ -160,28 +166,37 @@ console.log("cDetails", cDetails);
                       <CardTitle className="text-lg">Tool Information</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex items-center justify-between">
+                      {cDetails.companyName && (
+                        <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Company</span>
                         <div className="flex items-center gap-2">
                           <Building className="h-4 w-4" />
                           <span className="font-medium">{cDetails.companyName}</span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
+                      )}
+                      {cDetails.authorBy && (
+                        <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Created by</span>
-                        <span className="font-medium">{cDetails.createdBy}</span>
+                        <span className="font-medium">{cDetails.authorBy}</span>
                       </div>
-                      <div className="flex items-center justify-between">
+                      )}
+                      {cDetails.price && (
+                        <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Pricing</span>
                         <span className="font-medium">{cDetails.price}</span>
                       </div>
-                      <div className="flex items-center justify-between">
+                      )}
+                      {cDetails.launchDate && (
+                        <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Launch Date</span>
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4" />
-                          <span className="font-medium">{new Date(cDetails.createdAt).toLocaleDateString()}</span>
+                          <span className="font-medium">{new Date(cDetails.launchDate).toLocaleDateString()}</span>
                         </div>
-                      </div>
+                        </div>
+                      )}
+                     
                       <div className="pt-4 border-t border-primary/10">
                         <Button variant="outline" size="sm" className="w-full" asChild>
                           <a href={cDetails?.toolUrl} target="_blank" rel="noopener noreferrer">
@@ -335,11 +350,11 @@ console.log("cDetails", cDetails);
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {similarTools.map((similarTool, index) => (
+                {aiTools?.map((similarTool, index) => (
                   <Card key={similarTool.id} className="group hover:border-primary hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
                     {/* Tool Logo/Icon */}
-                    <div className="relative h-32 flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
-                      <div className="text-4xl group-hover:scale-110 transition-transform duration-300">{similarTool.logo}</div>
+                    <div className="relative h-32-test flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
+                      <div className="text-4xl group-hover:scale-110 transition-transform duration-300"> <img src={similarTool.bannerImage}/> </div>
                       <div className="absolute top-4 right-4">
                         <Badge className="primary-gradient text-white shadow-lg">
                           <Star className="h-3 w-3 mr-1" />
@@ -350,7 +365,10 @@ console.log("cDetails", cDetails);
                     
                     <CardContent className="p-6">
                       <div className="mb-4">
+                      <Link to={`/ai-tools/${similarTool?.name?.replace(/\s+/g, '-')}/${similarTool.id}`}>
+
                         <h4 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{similarTool.name}</h4>
+                        </Link>
                         <p className="text-muted-foreground text-sm font-medium mb-3">{similarTool.company}</p>
                         <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">{similarTool.tagline}</p>
                       </div>
@@ -369,7 +387,7 @@ console.log("cDetails", cDetails);
                       </div>
                       
                       {/* View Details Button */}
-                      <Link to={`/ai-tools/${similarTool.id}`}>
+                      <Link to={`/ai-tools/${similarTool?.name?.replace(/\s+/g, '-')}/${similarTool.id}`}>
                         <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
                           View Details
                           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

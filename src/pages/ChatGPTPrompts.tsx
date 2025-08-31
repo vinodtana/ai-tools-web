@@ -117,10 +117,13 @@ const { aIPromots, isLoading, pagination, aiCategories } = useAppSelector(
                             {prompt.rating}
                           </div>
                         </div>
+                        <Link to={`/chatgpt-prompts/${prompt?.name?.replace(/\s+/g, '-')}/${prompt.id}`} className="flex-1">
+
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">
                           {prompt.name}
                         </CardTitle>
-                        <p className="text-sm text-muted-foreground"> <p
+                        </Link>
+                        <p className="text-sm text-muted-foreground"> <p className='truncate-3-lines'
                                   dangerouslySetInnerHTML={{
                                     __html: prompt.overview,
                                   }}
@@ -149,7 +152,7 @@ const { aIPromots, isLoading, pagination, aiCategories } = useAppSelector(
                           <span className="text-xs">by {prompt.author}</span>
                         </div>
 
-                        <Link to={`/chatgpt-prompts/${prompt.id}`}>
+                        <Link to={`/chatgpt-prompts/${prompt?.name?.replace(/\s+/g, '-')}/${prompt.id}`}>
                           <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                             View Prompt
                             <ArrowRight className="ml-2 h-4 w-4" />
@@ -196,7 +199,7 @@ const { aIPromots, isLoading, pagination, aiCategories } = useAppSelector(
                       <CardTitle className="text-lg group-hover:text-primary transition-colors">
                         {prompt.name}
                       </CardTitle>
-                      <p className="text-sm text-muted-foreground"> <p
+                      <p className="text-sm text-muted-foreground"> <p className='truncate-3-lines'
                                   dangerouslySetInnerHTML={{
                                     __html: prompt.overview,
                                   }}
@@ -237,7 +240,7 @@ const { aIPromots, isLoading, pagination, aiCategories } = useAppSelector(
                           <Copy className="h-4 w-4 mr-2" />
                           Copy
                         </Button>
-                        <Link to={`/chatgpt-prompts/${prompt.id}`} className="flex-1">
+                        <Link to={`/chatgpt-prompts/${prompt?.name}/${prompt.id}`} className="flex-1">
                           <Button size="sm" className="w-full primary-gradient text-white">
                             View Details
                           </Button>

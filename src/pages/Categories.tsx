@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState , useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import RightSidebar from '@/components/RightSidebar';
@@ -27,11 +27,27 @@ import {
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAITools } from "../store/features/contents/contentsSlice";
+import { fetchAITools  } from "../store/features/contents/contentsSlice";
 
 const Categories = () => {
-  const [searchTerm, setSearchTerm] = useState('');
- const { aiInfluencers, isLoading, pagination, aiCategories } = useAppSelector(
+   const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
+    const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    const { toast } = useToast();
+  
+    const [searchQuery, setSearchQuery] = useState("");
+    const [selectedPricing, setSelectedPricing] = useState("all");
+  
+   
+  
+    useEffect(() => {
+      // page, limit, search, type, status, isActive, categoryIds
+      const jsonObj = { page: 1, limit: 50 };
+      dispatch(fetchAITools(jsonObj));
+    }, []);
+
+ const { aiTools, aiCategories } = useAppSelector(
     (state: any) => state.content
   );
   // Mock data for categories
@@ -93,7 +109,8 @@ const Categories = () => {
                 <Card className="hover:border-primary hover:shadow-2xl hover:scale-105 transition-all duration-300">
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-primary">
-                      {aiCategories?.reduce((sum, cat) => sum + cat.toolCount, 0)}
+                      {/* {aiCategories?.reduce((sum, cat) => sum + cat.toolCount, 0)} */}
+                      {aiTools?.length}
                     </div>
                     <div className="text-sm text-muted-foreground">Total Tools</div>
                   </CardContent>
@@ -156,7 +173,7 @@ const Categories = () => {
                             </div>
                           </div>
 
-                          <Link to={`/categories/${category.id}`}>
+                          <Link to={`/categories/${category?.name?.replace(/\s+/g, '-')}/${category.id}`}>
                             <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                               Explore Category
                               <ArrowRight className="ml-2 h-4 w-4" />
@@ -228,7 +245,7 @@ const Categories = () => {
                           </div>
                         </div>
 
-                        <Link to={`/categories/${category.id}`}>
+                        <Link to={`/categories/${category?.name?.replace(/\s+/g, '-')}/${category.id}`}>
                           <Button className="w-full group hover:bg-primary hover:text-white transition-all duration-200" variant="outline">
                             View {category?.toolCount} Tools
                             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

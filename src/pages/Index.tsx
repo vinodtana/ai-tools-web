@@ -276,24 +276,33 @@ const Index = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
+                  {tool.rating && tool.rating!=="0.0" && ( 
                   <div className="absolute top-4 right-4">
                     <Badge className="primary-gradient text-white shadow-lg">
                       <Star className="h-3 w-3 mr-1" />
                       {tool.rating}
                     </Badge>
                   </div>
+                  )}
                 </div>
                 
                 <CardContent className="p-6">
                   <div className="mb-4">
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{tool.name}</h3>
                     <p className="text-muted-foreground text-sm font-medium mb-3">{tool.tagline}</p>
-                    <p className="text-muted-foreground text-xs leading-relaxed">{tool.description}</p>
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                    <p className='truncate-3-lines'
+                                  dangerouslySetInnerHTML={{
+                                    __html: tool.overview,
+                                  }}
+                                ></p>
+
+                    </p>
                   </div>
                   
                   {/* Categories */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {tool?.categories?.slice(0, 2).map((category, catIndex) => (
+                    {tool?.category_names?.slice(0, 2).map((category, catIndex) => (
                       <Badge key={catIndex} variant="secondary" className="bg-primary/5 text-primary border-primary/20 text-xs">
                         {category}
                       </Badge>
@@ -306,9 +315,11 @@ const Index = () => {
                   </div>
                   
                   <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
+                  {tool?.usersCount > 0 && (
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <span>{tool.users} users</span>
+                      <span>{tool.usersCount} users</span>
                     </div>
+                    )}
                     <div className="flex flex-wrap gap-1">
                       {tool?.prices?.map((price, priceIndex) => (
                         <Badge key={priceIndex} className="primary-gradient text-white text-xs">

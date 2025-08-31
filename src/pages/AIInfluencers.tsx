@@ -129,9 +129,12 @@ const [searchTerm, setSearchTerm] = useState('');
                             </Badge>
                           )}
                         </div>
+                        <Link to={`/ai-influencers/${influencer?.name?.replace(/\s+/g, '-')}/${influencer.id}`}>
+
                         <CardTitle className="text-lg group-hover:text-primary transition-colors">
                           {influencer.name}
                         </CardTitle>
+                        </Link>
                         <p className="text-sm text-muted-foreground">{influencer.name}</p>
                       </CardHeader>
                       <CardContent>
@@ -171,7 +174,7 @@ const [searchTerm, setSearchTerm] = useState('');
                             )}
                           </div>
 
-                          <Link to={`/ai-influencers/${influencer?.id}`}>
+                          <Link to={`/ai-influencers/${influencer?.name?.replace(/\s+/g, '-')}/${influencer?.id}`}>
                             <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                               View Profile
                               <ArrowRight className="ml-2 h-4 w-4" />
@@ -308,7 +311,7 @@ const [searchTerm, setSearchTerm] = useState('');
                                 )}
                               </div>
                               
-                              <Link to={`/ai-influencers/${influencer.id}`}>
+                              <Link to={`/ai-influencers/${influencer?.name?.replace(/\s+/g, '-')}/${influencer.id}`}>
                                 <Button className="primary-gradient text-white hover:scale-105 transition-all duration-300">
                                   View Profile
                                   <ArrowRight className="ml-2 h-4 w-4" />

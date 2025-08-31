@@ -120,7 +120,11 @@ const AIArticles = () => {
                         <CardTitle className="text-xl group-hover:text-primary transition-colors">
                           {article.name}
                         </CardTitle>
-                        <p className="text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                        <p className='truncate-3-lines'
+                                  dangerouslySetInnerHTML={{
+                                    __html: article.overview,
+                                  }}
+                                ></p>
                       </CardHeader>
                       <CardContent>
                         <div className="flex flex-wrap gap-1 mb-4">
@@ -148,7 +152,7 @@ const AIArticles = () => {
                           </div>
                         </div>
 
-                        <Link to={`/ai-articles/${article.id}`}>
+                        <Link to={`/ai-articles/${article?.name?.replace(/\s+/g, '-')}/${article.id}`}>
                           <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                             Read Article
                             <ArrowRight className="ml-2 h-4 w-4" />
@@ -196,9 +200,11 @@ const AIArticles = () => {
                           <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                             {article.name}
                           </h3>
-                          <p className="text-muted-foreground mb-4 line-clamp-2">
-                            {article.excerpt}
-                          </p>
+                          <p className='truncate-3-lines'
+                                  dangerouslySetInnerHTML={{
+                                    __html: article.overview,
+                                  }}
+                                ></p>
 
                           <div className="flex flex-wrap gap-1 mb-4">
                             {article?.tags?.map(tag => (
@@ -228,7 +234,7 @@ const AIArticles = () => {
                               </div>
                             </div>
 
-                            <Link to={`/ai-articles/${article.id}`}>
+                            <Link to={`/ai-articles/${article?.name?.replace(/\s+/g, '-')}/${article.id}`}>
                               <Button className="primary-gradient text-white hover:scale-105 transition-all duration-300">
                                 Read More
                                 <ArrowRight className="ml-2 h-4 w-4" />

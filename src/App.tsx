@@ -42,26 +42,32 @@ const App = () => (
           {/* AI Tools Routes */}
           <Route path="/ai-tools" element={<AITools />} />
           <Route path="/ai-tools/:id" element={<AIToolDetail />} />
+          <Route path="/ai-tools/:name/:id" element={<AIToolDetail />} />
           
           {/* ChatGPT Prompts Routes */}
           <Route path="/chatgpt-prompts" element={<ChatGPTPrompts />} />
           <Route path="/chatgpt-prompts/:id" element={<PromptDetail />} />
+          <Route path="/chatgpt-prompts/:name/:id" element={<PromptDetail />} />
           
           {/* AI Articles Routes */}
           <Route path="/ai-articles" element={<AIArticles />} />
           <Route path="/ai-articles/:id" element={<ArticleDetail />} />
+          <Route path="/ai-articles/:name/:id" element={<ArticleDetail />} />
           
           {/* AI News Routes */}
           <Route path="/ai-news" element={<AINews />} />
           <Route path="/ai-news/:id" element={<NewsDetail />} />
+          <Route path="/ai-news/:name/:id" element={<NewsDetail />} />
           
           {/* AI Influencers Routes */}
           <Route path="/ai-influencers" element={<AIInfluencers />} />
           <Route path="/ai-influencers/:id" element={<InfluencerDetail />} />
+          <Route path="/ai-influencers/:name/:id" element={<InfluencerDetail />} />
           
           {/* Categories Routes */}
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/:id" element={<CategoryDetail />} />
+          <Route path="/categories/:name/:id" element={<CategoryDetail />} />
           
           {/* Additional Pages */}
           <Route path="/about" element={<About />} />

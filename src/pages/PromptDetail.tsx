@@ -38,12 +38,14 @@ const PromptDetail = () => {
  console.log("cDetails", cDetails);
   useEffect(() => {
      dispatch(fetchAIToolDetails(id));
-   }, []);
-   useEffect(() => {
-     // page, limit, search, type, status, isActive, categoryIds
      const jsonObj = { page: 1, limit: 50 };
      dispatch(fetchAIPromots(jsonObj));
    }, []);
+   useEffect(() => {
+    dispatch(fetchAIToolDetails(id));
+    const jsonObj = { page: 1, limit: 50 };
+     dispatch(fetchAIPromots(jsonObj));
+   }, [id]);
   
  
   const copyPrompt = () => {
@@ -148,6 +150,9 @@ const PromptDetail = () => {
             </Card>
 
             {/* Prompt Text */}
+            {cDetails.promptTemplate && (
+
+          
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -171,7 +176,7 @@ const PromptDetail = () => {
                 </div>
               </CardContent>
             </Card>
-
+          )}
             {/* Use Cases */}
             <Card className="mb-8">
               <CardHeader>
@@ -190,6 +195,7 @@ const PromptDetail = () => {
             </Card>
 
             {/* Instructions */}
+            {cDetails?.instructions?.length > 0 && (  
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle>How to Use This Prompt</CardTitle>
@@ -207,8 +213,9 @@ const PromptDetail = () => {
                 </div>
               </CardContent>
             </Card>
-
+            ) }
             {/* Examples */}
+            {cDetails?.examples?.length > 0 && (  
             <Card className="mb-8">
               <CardHeader>
                 <CardTitle>Example Usage</CardTitle>
@@ -235,7 +242,7 @@ const PromptDetail = () => {
                 ))}
               </CardContent>
             </Card>
-
+            ) }
           </div>
 
           {/* Right Sidebar */}
@@ -256,7 +263,7 @@ const PromptDetail = () => {
                   <SimilarItemCard
                     key={index}
                     item={similarPrompt}
-                    linkTo={`/chatgpt-prompts/${cDetails.id}`}
+                    linkTo={`/chatgpt-prompts/${similarPrompt?.name?.replace(/\s+/g, '-')}/${similarPrompt.id}`}
                     type="prompt"
                   />
                 ))}

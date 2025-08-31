@@ -146,22 +146,22 @@ const InfluencerDetail = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Followers</span>
-                        <span className="font-medium">{cDetails.followers}</span>
+                        <span className="text-muted-foreground">Followers: </span>
+                        <span className="font-medium">{cDetails.followers || `5,00,000 Users`}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Rating</span>
+                        <span className="text-muted-foreground">Rating: </span>
                         <div className="flex items-center gap-2">
                           <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="font-medium">{cDetails.rating}</span>
+                          <span className="font-medium">{cDetails.rating || `4.5`}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Since</span>
-                        <span className="font-medium">{new Date(cDetails.joinDate).getFullYear()}</span>
+                        <span className="text-muted-foreground">Since: </span>
+                        <span className="font-medium">{new Date(cDetails.createdAt).getFullYear()}</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground">Specialties</span>
+                        <span className="text-muted-foreground">Specialties: </span>
                         <span className="font-medium">{cDetails?.specialties?.length}</span>
                       </div>
                     </CardContent>
@@ -200,6 +200,9 @@ const InfluencerDetail = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
+                {(cDetails?.achievements?.length == 0 || !cDetails?.achievements?.length) && (
+                  <p className="text-sm text-muted-foreground">No achievements listed.</p>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {cDetails?.achievements?.map((achievement, index) => (
                     <div key={index} className="flex items-start gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors">
@@ -217,6 +220,9 @@ const InfluencerDetail = () => {
                 <CardTitle>Key Contributions to AI</CardTitle>
               </CardHeader>
               <CardContent>
+              {(cDetails?.keyContributions?.length == 0 || !cDetails?.keyContributions?.length) && (
+                  <p className="text-sm text-muted-foreground">No key Contributions listed.</p>
+                )}
                 <div className="space-y-3">
                   {cDetails?.keyContributions?.map((contribution, index) => (
                     <div key={index} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5">
@@ -234,6 +240,9 @@ const InfluencerDetail = () => {
                 <CardTitle>Recent Content & Activities</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+              {(cDetails?.recentContent?.length == 0 || !cDetails?.recentContent?.length) && (
+                  <p className="text-sm text-muted-foreground">No Recent Content listed.</p>
+                )}
                 {cDetails?.recentContent?.map((content, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
                     <div className="flex-1">
@@ -280,7 +289,7 @@ const InfluencerDetail = () => {
                   <SimilarItemCard
                     key={index}
                     item={similarInfluencer}
-                    linkTo={`/ai-influencers/${similarInfluencer.id}`}
+                    linkTo={`/ai-influencers/${similarInfluencer?.name?.replace(/\s+/g, '-')}/${similarInfluencer.id}`}
                     type="influencer"
                   />
                 ))}

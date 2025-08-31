@@ -2,9 +2,10 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, Users, Calendar, Clock, Eye, User, ArrowRight, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-const 
-SimilarItemCard = ({ item, linkTo, type }: any) => {
+const SimilarItemCard = ({ item, linkTo, type }: any) => {
   // Get default image based on type
   const getDefaultImage = () => {
     const gradients = {
@@ -71,6 +72,12 @@ SimilarItemCard = ({ item, linkTo, type }: any) => {
             </div>
           </div>
         )}
+        <Link to={`/chatgpt-prompts/${item?.name?.replace(/\s+/g, '-')}/${item.id}`}>
+                          <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
+                            View Prompt
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
       </CardContent>
     </Card>
   );
@@ -229,6 +236,13 @@ SimilarItemCard = ({ item, linkTo, type }: any) => {
             )}
           </div>
         )}
+         <Link to={`/ai-influencers/${item?.name?.replace(/\s+/g, '-')}/${item.id}`}>
+                          <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
+                            View Profile
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </Link>
+
       </CardContent>
     </Card>
   );

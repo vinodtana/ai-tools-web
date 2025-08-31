@@ -78,20 +78,23 @@ console.log("cDetails", cDetails);
                 <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground mb-6">
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    <span>{cDetails.author}</span>
+                    <span>{cDetails.authorBy || `TopAITools Author`}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{new Date(cDetails.publishDate).toLocaleDateString()}</span>
+                    <span>{new Date(cDetails.createdAt).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
-                    <span>{cDetails.readTime}</span>
+                    <span>{cDetails?.readTime || `5 mins`}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    <span>{cDetails.views} views</span>
-                  </div>
+                  {cDetails.views && (
+                      <div className="flex items-center gap-2">
+                      <Eye className="h-4 w-4" />
+                      <span>{cDetails.views} views</span>
+                      </div>
+                  )}
+                 
                 </div>
 
                 {/* Tags */}
@@ -105,15 +108,17 @@ console.log("cDetails", cDetails);
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4">
-                  <Button variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
                     <Heart className="mr-2 h-4 w-4" />
-                    Like ({cDetails.likes})
+                    Like 
+                    {/* ({cDetails.likes}) */}
                   </Button>
-                  <Button variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Comments ({cDetails.comments})
+                    Comments 
+                    {/* ({cDetails.comments}) */}
                   </Button>
-                  <Button variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
                   </Button>
@@ -138,6 +143,9 @@ console.log("cDetails", cDetails);
             </Card>
 
             {/* Author Bio */}
+            {cDetails.authorBy && (
+
+          
             <Card className="mb-8">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
@@ -146,7 +154,9 @@ console.log("cDetails", cDetails);
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold mb-2">About the Author</h3>
-                    <p className="font-semibold text-primary mb-2">{cDetails.author}</p>
+                    <p className="font-semibold text-primary mb-2">Name: {cDetails.authorBy}</p>
+                    <p className="font-semibold text-primary mb-2">Location: {cDetails.authorLocation}</p>
+                    <p className="font-semibold text-primary mb-2">Role: {cDetails.authorRole}</p>
                     <p className="text-muted-foreground">
                       {cDetails.authorBio}
                     </p>
@@ -154,7 +164,7 @@ console.log("cDetails", cDetails);
                 </div>
               </CardContent>
             </Card>
-
+          )}
           </div>
 
           {/* Right Sidebar */}
@@ -175,7 +185,7 @@ console.log("cDetails", cDetails);
                   <SimilarItemCard
                     key={index}
                     item={similarArticle}
-                    linkTo={`/ai-articles/${cDetails.id}`}
+                    linkTo={`/ai-articles/${similarArticle?.name?.replace(/\s+/g, '-')}/${similarArticle.id}`}
                     type="article"
                   />
                 ))}

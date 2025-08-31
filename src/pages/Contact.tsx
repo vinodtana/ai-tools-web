@@ -26,12 +26,18 @@ const Contact = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     if(formData.name && formData.email && formData.subject && formData.message) {
-      dispatch(getInTouchAPI({ email: formData.email, name: formData.name, subject: formData.subject, message: formData.message }));  
+      await dispatch(getInTouchAPI({ email: formData.email, name: formData.name, subject: formData.subject, message: formData.message }));  
       // Here you would typically handle the form submission, e.g., send the data to your server
       console.log('Form submitted:', formData);
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
       toast({
         title: "Message Sent",   
         description: "Thank you for reaching out to us. We'll get back to you soon.",

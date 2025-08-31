@@ -120,7 +120,8 @@ const AITools = () => {
               <div className="relative h-48 overflow-hidden">
                 <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                   <div className="text-6xl">
-                    <img src={tool.bannerImage}/>
+                    <img src={tool.bannerImage} alt={tool?.name} onClick={()=>{window.open(`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`, "_blank")}} />
+              
                   </div>
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
@@ -134,15 +135,17 @@ const AITools = () => {
 
               <CardContent className="p-6">
                 <div className="mb-4">
+                  <a target="_blank" href={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`} className="no-underline">
                   <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
                     {tool.name}
                   </h3>
+                  </a>
                   <p className="text-muted-foreground text-sm font-medium mb-3">
                     {tool.tagline}
                   </p>
                   <p className="text-muted-foreground text-xs leading-relaxed">
                     {/* {tool.overview} */}
-                     <p
+                     <p className="truncate-3-lines"
                                   dangerouslySetInnerHTML={{
                                     __html: tool.overview,
                                   }}
@@ -181,7 +184,7 @@ const AITools = () => {
                 </div>
 
                 {/* View Details Button */}
-                <Link to={`/ai-tools/${tool.id}`}>
+                <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
                   <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
                     View Details
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
