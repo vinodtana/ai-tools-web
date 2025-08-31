@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchCategories } from "../store/features/contents/contentsSlice";
 import { User as UserIcon, ChevronDown } from 'lucide-react';
+import { triggerMixpanelEvent } from '../Scenes/common';
+
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,7 +29,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       dispatch(fetchCategories({ page: 1, limit: 100, search: searchQuery }));
     } ,[])
  
+    // useEffect(()=>{
+    //   triggerMixpanelEvent("page_on_load");
+    // }, [])
 
+    // 👇 Run this whenever route changes
+    useEffect(() => {
+      if (location?.pathname) {
+        triggerMixpanelEvent("page_view", {
+          path: location.pathname,
+        });
+      }
+    }, [location.pathname]); // <-- dependency on path
+  
 
   const primaryNavigation = [
     { name: 'AI Tools', href: '/ai-tools', icon: Bot },
