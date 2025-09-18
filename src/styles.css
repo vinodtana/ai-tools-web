@@ -12,3 +12,9 @@
   .logo-image{
     max-width: 100px;
   }
+  .w-100{
+    width: 100%;
+  }
+  .text-transform-capitalize{
+    text-transform: capitalize;
+  }

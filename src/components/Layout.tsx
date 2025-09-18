@@ -10,7 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { fetchCategories } from "../store/features/contents/contentsSlice";
 import { User as UserIcon, ChevronDown } from 'lucide-react';
 import { triggerMixpanelEvent } from '../Scenes/common';
-
+import { fetchAITools } from "../store/features/contents/contentsSlice";
+import { ITEMS_LIMIT } from "../config";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,6 +29,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     useEffect(()=>{
       dispatch(fetchCategories({ page: 1, limit: 100, search: searchQuery }));
     } ,[])
+    //  useEffect(()=>{
+    // getAllAIToolsList();
+    // } ,[searchQuery])
+    // const getAllAIToolsList =()=>{
+    //   const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery };
+    //   dispatch(fetchAITools(jsonObj));  
+    // }
  
     // useEffect(()=>{
     //   triggerMixpanelEvent("page_on_load");

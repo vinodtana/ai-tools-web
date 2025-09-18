@@ -51,7 +51,7 @@ const Index = () => {
 
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
-    const jsonObj = { page: 1, limit: 50 };
+    const jsonObj = { page: 1, limit: 6 };
     dispatch(fetchAITools(jsonObj));
   }, []);
 
@@ -271,7 +271,7 @@ const Index = () => {
                 {/* Tool Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img 
-                    src={tool.bannerImage} 
+                    src={tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp} 
                     alt={tool.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />

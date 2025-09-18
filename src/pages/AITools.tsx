@@ -24,6 +24,8 @@ import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchAITools } from "../store/features/contents/contentsSlice";
+import { ITEMS_LIMIT } from "../config";
+
 const AITools = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -41,9 +43,16 @@ const AITools = () => {
 
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
-    const jsonObj = { page: 1, limit: 50 };
+    const jsonObj = { page: 1, limit: ITEMS_LIMIT };
     dispatch(fetchAITools(jsonObj));
   }, []);
+    useEffect(()=>{
+    getAllAIToolsList();
+    } ,[searchQuery])
+    const getAllAIToolsList =()=>{
+      const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery };
+      dispatch(fetchAITools(jsonObj));  
+    }
   // Mock data - in real app this would come from API
 
   const pricingOptions = ["all", "Free", "Freemium", "Paid"];
@@ -120,7 +129,7 @@ const AITools = () => {
               <div className="relative h-48 overflow-hidden">
                 <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                   <div className="text-6xl">
-                    <img src={tool.bannerImage} alt={tool?.name} onClick={()=>{window.open(`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`, "_blank")}} />
+                    <img src={tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp} alt={tool?.name} onClick={()=>{window.open(`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`, "_blank")}} />
               
                   </div>
                 </div>
@@ -143,6 +152,15 @@ const AITools = () => {
                   <p className="text-muted-foreground text-sm font-medium mb-3">
                     {tool.tagline}
                   </p>
+                  {tool?.companyName && (
+                  <p className="text-muted-foreground text-sm font-medium mb-3">
+                    {tool.companyName}
+                  </p>
+                  )}
+
+                 
+                 
+                  
                   <p className="text-muted-foreground text-xs leading-relaxed">
                     {/* {tool.overview} */}
                      <p className="truncate-3-lines"
@@ -156,7 +174,7 @@ const AITools = () => {
 
                 {/* Categories */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {tool.category_names?.slice(0, 2).map((category, catIndex) => (
+                  {tool.categoryNamesList?.slice(0, 2).map((category, catIndex) => (
                     <Badge
                       key={catIndex}
                       variant="secondary"
@@ -165,14 +183,18 @@ const AITools = () => {
                       {category}
                     </Badge>
                   ))}
-                  {tool.categories.length > 2 && (
+                  {tool.categoryNamesList.length > 2 && (
                     <Badge variant="outline" className="text-xs">
-                      +{tool.categories?.length - 2}
+                      +{tool.categoryNamesList?.length - 2}
                     </Badge>
                   )}
                 </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
+                  {tool?.planType && (
+                  <p className="text-muted-foreground text-sm font-medium mb-3">
+                    {tool.planType}
+                  </p>
+                  )}
+                {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <span>{tool.users} users</span>
                   </div>
@@ -181,7 +203,7 @@ const AITools = () => {
                       {tool.price}
                     </Badge>
                   </div>
-                </div>
+                </div> */}
 
                 {/* View Details Button */}
                 <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
