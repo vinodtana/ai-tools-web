@@ -48,7 +48,8 @@ useEffect(() => {
     console.log("profile save resp", resp);
     dispatch(setUpdateUserData({...user, name: userProfile.name, bio: userProfile.bio}));
   };
-
+  const uName = user?.name?.split(' ').map(n => n[0]).join('');
+  const uemailchat = user?.email?.charAt(0);
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -58,7 +59,7 @@ useEffect(() => {
               <div className="flex flex-col items-center gap-4">
                 <Avatar className="w-32 h-32">
                   <AvatarFallback className="text-2xl">
-                    {user.name.split(' ').map(n => n[0]).join('')}
+                    {uName?.toUpperCase() || uemailchat?.toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </div>

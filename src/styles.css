@@ -18,3 +18,14 @@
   .text-transform-capitalize{
     text-transform: capitalize;
   }
+  .ai-summary-pagination{
+    /* text-align: center;
+    margin-top: 20px;
+    justify-content: center;
+    display: flex; */
+  }
+  .ai-pagination-content{
+     margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }

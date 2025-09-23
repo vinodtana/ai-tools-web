@@ -14,6 +14,11 @@ export const handleSignupAPI = createAsyncThunk('tools/handleSignupAPI', async (
 export const handleLoginAPI = createAsyncThunk('tools/handleLoginAPI', async (body: any) => {
   return await post(`${SERVER_IP}/auth/signin`, body);
 });
+export const checkSocialUserAPI = createAsyncThunk('tools/checkSocialUserAPI', async (body: any) => {
+  return await post(`${SERVER_IP}/auth/google`, body);
+});
+
+
 export const handlePrifileSave = createAsyncThunk('tools/handlePrifileSave', async (body: any) => {
   return await put(`${SERVER_IP}/users/${body?.id}`, body.user);
 });
@@ -24,7 +29,7 @@ export const fetchCategories= createAsyncThunk(
   async (params: any) => {
     const queryString = toQueryParams(params);
     console.log("params", params);
-    const response = await fetch(`${SERVER_IP}/categories?${queryString}`);
+    const response = await fetch(`${SERVER_IP}/categories/content-categories?${queryString}`);
     return response.json();
   }
 );
@@ -105,6 +110,8 @@ const initialState: any = {
   user: userData !== null ? JSON.parse(userData) : {},
   token: localStorage.getItem('token'),
   aiTools: [],
+  aiToolsPagination:{},
+  showLoginModel: false,
   aIPromots: [],
   aIArticles: [],
   aINews: [],
@@ -136,6 +143,10 @@ const aiContentsSlice = createSlice({
       state.user = action.payload;
       localStorage.setItem('user', JSON.stringify(action.payload));
     },
+    setShowLoginModel: (state, action: PayloadAction<boolean>) => {
+      state.showLoginModel= action.payload;
+    },
+    
     clearError: (state) => {
       state.error = null;
     },
@@ -178,6 +189,21 @@ const aiContentsSlice = createSlice({
       state.error = action.error.message || 'Login failed';
       state.isAuthenticated = false;
     })
+    .addCase(checkSocialUserAPI.fulfilled, (state, action) => {
+      state.isLoading = false;
+      console.log('Login successful:', action.payload);
+      const uData = {...action.payload?.data?.user, token: action.payload?.data.token};
+      state.user = uData;
+      state.token = action.payload?.data.token;
+      localStorage.setItem('user', JSON.stringify(uData));
+      localStorage.setItem('token', action.payload?.data.token);
+    })
+    .addCase(checkSocialUserAPI.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message || 'Login failed';
+      state.isAuthenticated = false;
+    })
+    
       .addCase(fetchAITools.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -185,7 +211,8 @@ const aiContentsSlice = createSlice({
       .addCase(fetchAITools.fulfilled, (state, action) => {
         state.loading = false;
         state.aiTools = action.payload.data || [];
-        state.toolsCount = action.payload.pagination || 1;
+        console.log("action.payload", action.payload);
+        state.aiToolsPagination = action.payload.pagination || 1;
       })
       
       .addCase(fetchAITools.rejected, (state, action) => {
@@ -226,5 +253,5 @@ const aiContentsSlice = createSlice({
   },
 });
 
-export const { setSearchTerm, setSelectedCategory, setCurrentPage, clearError, setUpdateUserData } = aiContentsSlice.actions;
+export const { setSearchTerm, setSelectedCategory, setCurrentPage, clearError, setUpdateUserData , setShowLoginModel} = aiContentsSlice.actions;
 export default aiContentsSlice.reducer;

@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { useGoogleAuth } from '@/hooks/useGoogleAuth';
 import { GoogleUserInfo } from '@/config/google-auth';
+import SocialLoginButtons from "@/components/SocialLoginButtons/SocialLoginButtons";
 
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
@@ -54,6 +55,10 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
       }
     }, [user]);
   const { signInWithGoogle, isLoading: googleLoading } = useGoogleAuth();
+    const closeModel = () => {
+console.log("vinod, vinod");
+  };
+  const navigateUserSocial = (udata: any) => {};
 
   const handleLogin = async(e: React.FormEvent) => {
     e.preventDefault();
@@ -171,8 +176,14 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
                 </span>
               </div>
             </div>
-
-            <Button
+              <div className="g-butttons">
+                      <SocialLoginButtons
+                        closeModel={closeModel}
+                        isSignUp={true}
+                        navigateUserSocial={navigateUserSocial}
+                      />
+                    </div>
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full"
@@ -198,13 +209,13 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
                 />
               </svg>
               {googleLoading ? 'Signing in...' : 'Continue with Google'}
-            </Button>
+            </Button> */}
 
-            <div className="text-center mt-4">
+            {/* <div className="text-center mt-4">
               <Button variant="link" className="text-sm text-muted-foreground">
                 Forgot your password?
               </Button>
-            </div>
+            </div> */}
           </TabsContent>
 
           <TabsContent value="signup" className="space-y-4">
@@ -312,8 +323,14 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
                 </span>
               </div>
             </div>
-
-            <Button
+            <div className="g-butttons">
+                      <SocialLoginButtons
+                        closeModel={closeModel}
+                        isSignUp={true}
+                        navigateUserSocial={navigateUserSocial}
+                      />
+                    </div>
+            {/* <Button
               type="button"
               variant="outline"
               className="w-full"
@@ -339,7 +356,7 @@ const LoginModal = ({ open, onOpenChange }: LoginModalProps) => {
                 />
               </svg>
               {googleLoading ? 'Signing in...' : 'Continue with Google'}
-            </Button>
+            </Button> */}
           </TabsContent>
         </Tabs>
 

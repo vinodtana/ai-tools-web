@@ -129,7 +129,7 @@ const Index = () => {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-[95vh] flex items-center">
+      <section className="relative overflow-hidden min-h-[60vh] flex items-center">
         {/* Premium Animated Background Elements */}
         <div className="absolute inset-0 purple-light-gradient">
           {/* Multiple animated orbs for premium effect */}
@@ -163,10 +163,10 @@ const Index = () => {
         {/* Premium glass effect overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-primary/5 backdrop-blur-[0.5px]"></div>
         
-        <div className="relative container mx-auto px-4 py-24 z-10">
+        <div className="relative container mx-auto px-4 py-6 z-10">
           <div className="max-w-5xl mx-auto text-center">
             {/* Enhanced badge with premium animation */}
-            <div className="mb-8 animate-slide-up">
+            <div className="mb-2 animate-slide-up">
               <Badge className="relative mb-2 animate-pulse-glow purple-light-gradient border-primary/30 px-6 py-2 text-sm font-semibold shadow-lg">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/40 rounded-full blur-md"></div>
                 <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
@@ -180,19 +180,19 @@ const Index = () => {
             </div>
             
             {/* Enhanced title with staggered animation */}
-            <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 leading-tight">
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-4 leading-tight">
               <div className="animate-slide-up">
                 <span className="primary-gradient bg-clip-text text-transparent hover:scale-105 transition-transform duration-500 inline-block">
-                  Discover the
+                  Discover the  Future of
                 </span>
               </div>
-              <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              {/* <div className="animate-slide-up" style={{ animationDelay: '0.2s' }}>
                 <span className="primary-gradient bg-clip-text text-transparent hover:scale-105 transition-transform duration-500 inline-block">
-                  Future
+                
                 </span>
-              </div>
+              </div> */}
               <div className="animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                <span className="text-foreground hover:text-primary transition-colors duration-500">of <span className='ai-name-top-primary'>AI</span> Tools</span>
+                <span className="text-foreground hover:text-primary transition-colors duration-500"> <span className='ai-name-top-primary'>AI</span> Tools</span>
               </div>
             </h1>
             
@@ -202,7 +202,7 @@ const Index = () => {
                 Your ultimate destination for AI tools, news, articles, and insights. 
                 Stay ahead with the best AI resources curated for professionals.
               </p>
-              <p className="text-lg text-muted-foreground/80 mb-10 max-w-2xl mx-auto">
+              <p className="text-lg text-muted-foreground/80 mb-6 max-w-2xl mx-auto">
                 Join thousands of innovators who trust our platform to discover cutting-edge AI solutions
               </p>
             </div>
@@ -222,10 +222,17 @@ const Index = () => {
                   Latest AI News
                 </Button>
               </Link>
+               <Link to="/ai-tools">
+                <Button size="lg" className="group relative primary-gradient text-lg px-10 py-4 soft-shadow hover:scale-110 transition-all duration-300 overflow-hidden">
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 skew-x-12"></div>
+                  <Search className="mr-3 h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="relative z-10">Top AI Tools</span>
+                </Button>
+              </Link>
             </div>
             
             {/* Trust indicators */}
-            <div className="mt-12 animate-slide-up" style={{ animationDelay: '1s' }}>
+            <div className="mt-6 animate-slide-up" style={{ animationDelay: '1s' }}>
               <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
@@ -267,7 +274,9 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {aiTools?.map((tool, index) => (
-              <Card key={tool.id} className="group hover:bg-transparent hover:border-primary hover:shadow-2xl transition-all duration-500 animate-slide-up overflow-hidden hover:scale-105" style={{ animationDelay: `${index * 0.15}s` }}>
+                              <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
+
+              <Card key={tool.id} className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all duration-500 animate-slide-up overflow-hidden hover:scale-105-111" style={{ animationDelay: `${index * 0.15}s` }}>
                 {/* Tool Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img 
@@ -275,6 +284,7 @@ const Index = () => {
                     alt={tool.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
+                 
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
                   {tool.rating && tool.rating!=="0.0" && ( 
                   <div className="absolute top-4 right-4">
@@ -288,8 +298,10 @@ const Index = () => {
                 
                 <CardContent className="p-6">
                   <div className="mb-4">
+                <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
                     <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{tool.name}</h3>
                     <p className="text-muted-foreground text-sm font-medium mb-3">{tool.tagline}</p>
+                  </Link>
                     <p className="text-muted-foreground text-xs leading-relaxed">
                     <p className='truncate-3-lines'
                                   dangerouslySetInnerHTML={{
@@ -330,7 +342,7 @@ const Index = () => {
                   </div>
                   
                   {/* View Details Button */}
-                  <Link to={`/ai-tools/${tool.id}`}>
+                  <Link to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
                     <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
                       View Details
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -338,6 +350,7 @@ const Index = () => {
                   </Link>
                 </CardContent>
               </Card>
+               </Link>
             ))}
           </div>
           

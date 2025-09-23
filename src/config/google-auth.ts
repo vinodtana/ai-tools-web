@@ -1,9 +1,9 @@
 // Google OAuth Configuration
 // Replace GOOGLE_CLIENT_ID with your actual Google Client ID
 export const GOOGLE_CONFIG = {
-  clientId: "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com",
+  clientId: "671836193303-1birniae3tqs9juo2mlmt3pmjavic3i4.apps.googleusercontent.com",
   // Add your domain here when deploying
-  redirectUri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173'
+  redirectUri: typeof window !== 'undefined' ? window.location.origin : 'https://www.topaitools.ai'
 };
 
 // Google Identity Services types

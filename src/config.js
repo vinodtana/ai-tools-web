@@ -27,4 +27,4 @@ export const MIXPANEL_ID = MIXPANEL_ID1;
 export const S3_BUCKET = "rasko-images";
 // .s3.ap-south-1.amazonaws.com
 export const REGION = "us-east-1";
-export const ITEMS_LIMIT = 50;
+export const ITEMS_LIMIT = 30;

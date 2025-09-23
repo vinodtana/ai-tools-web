@@ -1,95 +1,112 @@
-import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Search, Menu, X, Bot, Zap, FileText, Newspaper, Users, FolderTree, Mail, Info, Phone, User, Settings } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import LoginModal from './LoginModal';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Search,
+  Menu,
+  X,
+  Bot,
+  Zap,
+  FileText,
+  Newspaper,
+  Users,
+  FolderTree,
+  Mail,
+  Info,
+  Phone,
+  User,
+  Settings,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import LoginModal from "./LoginModal";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchCategories } from "../store/features/contents/contentsSlice";
-import { User as UserIcon, ChevronDown } from 'lucide-react';
-import { triggerMixpanelEvent } from '../Scenes/common';
+import { fetchCategories , setShowLoginModel} from "../store/features/contents/contentsSlice";
+import { User as UserIcon, ChevronDown } from "lucide-react";
+import { triggerMixpanelEvent } from "../Scenes/common";
 import { fetchAITools } from "../store/features/contents/contentsSlice";
 import { ITEMS_LIMIT } from "../config";
-
+ 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    const { toast } = useToast();
-    const { user } = useAppSelector(
-      (state: any) => state.content
-    );
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
+  const { user, showLoginModel } = useAppSelector((state: any) => state.content);
 
-    useEffect(()=>{
-      dispatch(fetchCategories({ page: 1, limit: 100, search: searchQuery }));
-    } ,[])
-    //  useEffect(()=>{
-    // getAllAIToolsList();
-    // } ,[searchQuery])
-    // const getAllAIToolsList =()=>{
-    //   const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery };
-    //   dispatch(fetchAITools(jsonObj));  
-    // }
- 
-    // useEffect(()=>{
-    //   triggerMixpanelEvent("page_on_load");
-    // }, [])
+  useEffect(() => {
+    dispatch(fetchCategories({ page: 1, limit: 100, search: searchQuery }));
+  }, []);
+     useEffect(()=>{
+    getAllAIToolsList();
+    } ,[searchQuery])
+    const getAllAIToolsList =()=>{
+      const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery};
+      dispatch(fetchAITools(jsonObj));  
+    }
 
-    // 👇 Run this whenever route changes
-    useEffect(() => {
-      if (location?.pathname) {
-        triggerMixpanelEvent("page_view", {
-          path: location.pathname,
-        });
-      }
-    }, [location.pathname]); // <-- dependency on path
-  
+  useEffect(()=>{
+    if(showLoginModel){
+      triggerMixpanelEvent("trigger_login_model");
+      setIsLoginOpen(true);
+      dispatch(setShowLoginModel(false));
+    }
+  }, [showLoginModel])
+
+  // 👇 Run this whenever route changes
+  useEffect(() => {
+    if (location?.pathname) {
+      triggerMixpanelEvent("page_view", {
+        path: location.pathname,
+      });
+    }
+  }, [location.pathname]); // <-- dependency on path
 
   const primaryNavigation = [
-    { name: 'AI Tools', href: '/ai-tools', icon: Bot },
-    { name: 'ChatGPT Prompts', href: '/chatgpt-prompts', icon: Zap },
-    { name: 'AI Articles', href: '/ai-articles', icon: FileText },
-    { name: 'AI News', href: '/ai-news', icon: Newspaper },
-    { name: 'AI Influencers', href: '/ai-influencers', icon: Users },
-    { name: 'Categories', href: '/categories', icon: FolderTree },
+    { name: "AI Tools", href: "/ai-tools", icon: Bot },
+    { name: "ChatGPT Prompts", href: "/chatgpt-prompts", icon: Zap },
+    { name: "AI Articles", href: "/ai-articles", icon: FileText },
+    { name: "AI News", href: "/ai-news", icon: Newspaper },
+    { name: "AI Influencers", href: "/ai-influencers", icon: Users },
+    { name: "Categories", href: "/categories", icon: FolderTree },
   ];
 
   const secondaryNavigation = [
-    { name: 'Newsletter', href: '/newsletter', icon: Mail },
-    { name: 'About', href: '/about', icon: Info },
-    { name: 'Contact', href: '/contact', icon: Phone },
+    { name: "Newsletter", href: "/newsletter", icon: Mail },
+    { name: "About", href: "/about", icon: Info },
+    { name: "Contact", href: "/contact", icon: Phone },
   ];
 
   const userNavigation = [
-    { name: 'Profile', href: '/profile', icon: User },
-    { name: 'Settings', href: '/settings', icon: Settings },
+    { name: "Profile", href: "/profile", icon: User },
+    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   const isActive = (path: string) => {
     // Exact match for the current path
     if (location.pathname === path) return true;
-    
+
     // Check for parent-child relationships for detail pages
-    const pathSegments = path.split('/').filter(Boolean);
-    const currentSegments = location.pathname.split('/').filter(Boolean);
-    
+    const pathSegments = path.split("/").filter(Boolean);
+    const currentSegments = location.pathname.split("/").filter(Boolean);
+
     // If we're on a detail page, check if the parent section matches
     if (currentSegments.length > pathSegments.length) {
       // Build the parent path from current segments
-      const parentPath = '/' + pathSegments.join('/');
-      const currentParentPath = '/' + currentSegments.slice(0, pathSegments.length).join('/');
+      const parentPath = "/" + pathSegments.join("/");
+      const currentParentPath =
+        "/" + currentSegments.slice(0, pathSegments.length).join("/");
       return parentPath === currentParentPath;
     }
-    
+
     return false;
   };
-
+  const uemailchat = user?.email?.charAt(0);
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -103,45 +120,53 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <Bot className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="text-xl font-bold primary-gradient bg-clip-text text-transparent">
-                Top<span className='ai-name-top-primary'>AI</span>Tools
+                Top<span className="ai-name-top-primary">AI</span>Tools
               </span>
             </Link>
 
             {/* Search & Actions */}
             <div className="flex items-center space-x-4">
-              {/* Global Search */}
               <div className="hidden sm:block">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Search AI tools..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e) => {navigate("/ai-tools"); setSearchQuery(e.target.value);}}
                     className="w-64 pl-9"
                   />
                 </div>
               </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              {/* Global Search */}
 
               {/* User Navigation */}
               <div className="hidden sm:flex items-center space-x-2">
-                {userNavigation.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                {user?.id && (
+                  <>
+                    {" "}
+                    {userNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.name}</span>
-                  </Link>
-                ))}
+                      >
+                        <item.icon className="h-4 w-4" />
+                        <span>{item.name}</span>
+                      </Link>
+                    ))}
+                  </>
+                )}
               </div>
-              
+
               {/* Login Button */}
-              
+
               {/* <Button
                 variant="outline"
                 onClick={() => setIsLoginOpen(true)}
@@ -150,47 +175,49 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 Login 1
               </Button> */}
               <div className="hidden sm:flex items-center space-x-2">
-  {!user?.id ? (
-    <Button
-      variant="outline"
-      onClick={() => setIsLoginOpen(true)}
-      className="hidden sm:flex"
-    >
-      Login
-    </Button>
-  ) : (
-    <div className="relative">
-      <button
-        className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent"
-        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-      >
-        <UserIcon className="h-5 w-5 text-muted-foreground" />
-        <span>{user?.name?.split(" ")[0]}</span>
-        <ChevronDown className="h-4 w-4 text-muted-foreground" />
-      </button>
-      {isUserMenuOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-border rounded-md shadow-lg z-10">
-          <Link
-            to="/profile"
-            className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-            onClick={() => setIsUserMenuOpen(false)}
-          >
-            My Profile
-          </Link>
-          <button
-            className="block w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-            onClick={() => {
-              localStorage.clear();
-              window.location.href = '/';
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
-  )}
-</div>
+                {!user?.id ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsLoginOpen(true)}
+                    className="hidden sm:flex"
+                  >
+                    Login
+                  </Button>
+                ) : (
+                  <div className="relative">
+                    <button
+                      className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors hover:bg-accent"
+                      onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    >
+                      <UserIcon className="h-5 w-5 text-muted-foreground" />
+                      <span>
+                        {user?.name?.split(" ")[0] || uemailchat?.toUpperCase()}
+                      </span>
+                      <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                    {isUserMenuOpen && (
+                      <div className="absolute right-0 mt-2 w-48 bg-white border border-border rounded-md shadow-lg z-10">
+                        <Link
+                          to="/profile"
+                          className="block px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          My Profile
+                        </Link>
+                        <button
+                          className="block w-full text-left px-4 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                          onClick={() => {
+                            localStorage.clear();
+                            window.location.href = "/";
+                          }}
+                        >
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {/* Mobile Menu Toggle */}
               <Button
@@ -199,7 +226,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 className="md:hidden"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
-                {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isMenuOpen ? (
+                  <X className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>
@@ -214,9 +245,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-1 px-4 py-2 rounded-md text-sm font-medium transition-colors hover-scale
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground shadow-md' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                       }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -235,9 +267,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-1 px-4 py-2 rounded-md text-sm font-medium transition-colors hover-scale
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground shadow-md' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground shadow-md"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                       }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -272,9 +305,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -294,9 +328,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -316,9 +351,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     key={item.name}
                     to={item.href}
                     className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors w-full
-                      ${isActive(item.href) 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-accent"
                       }`}
                     onClick={() => setIsMenuOpen(false)}
                   >
@@ -344,9 +380,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Footer */}
       <footer className="border-t border-border bg-secondary/30">
@@ -359,11 +393,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   <Bot className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <span className="text-xl font-bold primary-gradient bg-clip-text text-transparent">
-                  Top<span className='ai-name-top-primary'>AI</span>Tools
+                  Top<span className="ai-name-top-primary">AI</span>Tools
                 </span>
               </div>
               <p className="text-sm text-muted-foreground">
-                Discover the best AI tools, stay updated with latest AI news, and connect with AI influencers.
+                Discover the best AI tools, stay updated with latest AI news,
+                and connect with AI influencers.
               </p>
             </div>
 
@@ -371,16 +406,28 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Quick Links</h4>
               <div className="space-y-2">
-                <Link to="/ai-tools" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/ai-tools"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   AI Tools
                 </Link>
-                <Link to="/chatgpt-prompts" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/chatgpt-prompts"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   ChatGPT Prompts
                 </Link>
-                <Link to="/ai-articles" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/ai-articles"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   AI Articles
                 </Link>
-                <Link to="/ai-news" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/ai-news"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   AI News
                 </Link>
               </div>
@@ -390,13 +437,22 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Resources</h4>
               <div className="space-y-2">
-                <Link to="/about" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/about"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   About Us
                 </Link>
-                <Link to="/contact" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/contact"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   Contact Us
                 </Link>
-                <Link to="/newsletter" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/newsletter"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   Newsletter
                 </Link>
               </div>
@@ -406,10 +462,16 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h4 className="text-sm font-semibold">Account</h4>
               <div className="space-y-2">
-                <Link to="/profile" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/profile"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   My Profile
                 </Link>
-                <Link to="/settings" className="block text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                  to="/settings"
+                  className="block text-sm text-muted-foreground hover:text-foreground"
+                >
                   Settings
                 </Link>
               </div>

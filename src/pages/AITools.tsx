@@ -4,6 +4,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Pagination } from "antd";
+import {
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Eye,
+  ChevronLeft,
+  ChevronRight,
+  ToggleLeft,
+  ToggleRight,
+} from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -32,32 +44,42 @@ const AITools = () => {
   const { toast } = useToast();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPricing, setSelectedPricing] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { aiTools, isLoading, pagination, aiCategories } = useAppSelector(
-    (state: any) => state.content
-  );
+  const { aiTools, isLoading, aiToolsPagination, aiCategories } =
+    useAppSelector((state: any) => state.content);
   console.log("aiTools", aiTools);
+  console.log("aiToolsPagination", aiToolsPagination);
   console.log("aiCategories", aiCategories);
+  console.log("selectedCategory", selectedCategory);
 
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
-    const jsonObj = { page: 1, limit: ITEMS_LIMIT };
+    const jsonObj = { page: currentPage, limit: ITEMS_LIMIT };
     dispatch(fetchAITools(jsonObj));
   }, []);
-    useEffect(()=>{
+  useEffect(() => {
     getAllAIToolsList();
-    } ,[searchQuery])
-    const getAllAIToolsList =()=>{
-      const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery };
-      dispatch(fetchAITools(jsonObj));  
-    }
+  }, [searchQuery, currentPage, selectedCategory]);
+  const getAllAIToolsList = () => {
+    const jsonObj = {
+      page: currentPage,
+      limit: ITEMS_LIMIT,
+      search: searchQuery,
+      category_name: selectedCategory,
+    };
+    dispatch(fetchAITools(jsonObj));
+  };
+  const handleChangeStatus = (e: any) => {
+    setCurrentPage(e);
+    // setStatus(e.value);
+  };
   // Mock data - in real app this would come from API
 
   const pricingOptions = ["all", "Free", "Freemium", "Paid"];
 
- 
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -74,9 +96,20 @@ const AITools = () => {
             productivity.
           </p>
         </div>
+        <div className="md:text-3xl max-w-6xl mx-auto">
+          <h3 className="font-bold mb-4">Top Categories</h3>
 
+          <div className="text-center">
+              {aiCategories.map((category: any) => (
+              <>{category?.tool_count> 50 && (
+                  <Button onClick={() => setSelectedCategory(category?.category_name)} variant={selectedCategory === category?.category_name ? "default" : "outline"} className="m-2" key={category?.category_name}>{category?.category_name} ({category?.tool_count})</Button> 
+              )
+              }</>
+              ))}
+          </div>
+        </div>
         {/* Filters */}
-        <div className="mb-8 flex flex-col sm:flex-row gap-4">
+        <div className="mb-8 flex flex-col sm:flex-row gap-4 max-w-6xl mx-auto">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -94,16 +127,20 @@ const AITools = () => {
             </SelectTrigger>
             <SelectContent>
               {aiCategories.map((category: any) => (
-                <SelectItem key={category?.id} value={category?.id}>
-                  {selectedCategory === "all"
+                <SelectItem
+                  key={category?.category_name}
+                  value={category?.category_name}
+                >
+                  {/* {selectedCategory === "all"
                     ? "All Categories"
-                    : category?.name}
+                    : category?.name} */}
+                  {category?.category_name} ({category?.tool_count})
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={selectedPricing} onValueChange={setSelectedPricing}>
+          {/* <Select value={selectedPricing} onValueChange={setSelectedPricing}>
             <SelectTrigger className="w-full sm:w-48">
               <SelectValue placeholder="Pricing" />
             </SelectTrigger>
@@ -114,87 +151,110 @@ const AITools = () => {
                 </SelectItem>
               ))}
             </SelectContent>
-          </Select>
+          </Select> */}
         </div>
 
         {/* Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {aiTools?.map((tool, index) => (
-            <Card
-              key={tool.id}
-              className="group hover:bg-transparent hover:border-primary hover:shadow-2xl transition-all duration-500 animate-slide-up overflow-hidden hover:scale-105"
-              style={{ animationDelay: `${index * 0.15}s` }}
+            <Link
+              target="_blank"
+              to={`/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${tool.id}`}
             >
-              {/* Tool Image */}
-              <div className="relative h-48 overflow-hidden">
-                <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                  <div className="text-6xl">
-                    <img src={tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp} alt={tool?.name} onClick={()=>{window.open(`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`, "_blank")}} />
-              
+              <Card
+                key={tool.id}
+                className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all-111 duration-500-111 animate-slide-up-111 overflow-hidden-111 hover:scale-105-111"
+                style={{ animationDelay: `${index * 0.15}s` }}
+              >
+                {/* Tool Image */}
+                <div className="relative h-48 overflow-hidden">
+                  <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                    <div className="text-6xl">
+                      <img
+                        src={
+                          tool.bannerImage ||
+                          tool?.bannerImageTemp ||
+                          tool?.logoTemp
+                        }
+                        alt={tool?.name}
+                        onClick={() => {
+                          window.open(
+                            `/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${
+                              tool.id
+                            }`,
+                            "_blank"
+                          );
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
+                  <div className="absolute top-4 right-4">
+                    <Badge className="primary-gradient text-white shadow-lg">
+                      <Star className="h-3 w-3 mr-1" />
+                      {tool.rating}
+                    </Badge>
                   </div>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
-                <div className="absolute top-4 right-4">
-                  <Badge className="primary-gradient text-white shadow-lg">
-                    <Star className="h-3 w-3 mr-1" />
-                    {tool.rating}
-                  </Badge>
-                </div>
-              </div>
 
-              <CardContent className="p-6">
-                <div className="mb-4">
-                  <a target="_blank" href={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`} className="no-underline">
-                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                    {tool.name}
-                  </h3>
-                  </a>
-                  <p className="text-muted-foreground text-sm font-medium mb-3">
-                    {tool.tagline}
-                  </p>
-                  {tool?.companyName && (
-                  <p className="text-muted-foreground text-sm font-medium mb-3">
-                    {tool.companyName}
-                  </p>
-                  )}
-
-                 
-                 
-                  
-                  <p className="text-muted-foreground text-xs leading-relaxed">
-                    {/* {tool.overview} */}
-                     <p className="truncate-3-lines"
-                                  dangerouslySetInnerHTML={{
-                                    __html: tool.overview,
-                                  }}
-                                ></p>
-                   
-                  </p>
-                </div>
-
-                {/* Categories */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tool.categoryNamesList?.slice(0, 2).map((category, catIndex) => (
-                    <Badge
-                      key={catIndex}
-                      variant="secondary"
-                      className="bg-primary/5 text-primary border-primary/20 text-xs"
+                <CardContent className="p-6">
+                  <div className="mb-4">
+                    <a
+                      target="_blank"
+                      href={`/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${
+                        tool.id
+                      }`}
+                      className="no-underline"
                     >
-                      {category}
-                    </Badge>
-                  ))}
-                  {tool.categoryNamesList.length > 2 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{tool.categoryNamesList?.length - 2}
-                    </Badge>
-                  )}
-                </div>
+                      <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                        {tool.name}
+                      </h3>
+                    </a>
+                    <p className="text-muted-foreground text-sm font-medium mb-3">
+                      {tool.tagline}
+                    </p>
+                    {tool?.companyName && (
+                      <p className="text-muted-foreground text-sm font-medium mb-3">
+                        {tool.companyName}
+                      </p>
+                    )}
+
+                    <p className="text-muted-foreground text-xs leading-relaxed">
+                      {/* {tool.overview} */}
+                      <p
+                        className="truncate-3-lines"
+                        dangerouslySetInnerHTML={{
+                          __html: tool.overview,
+                        }}
+                      ></p>
+                    </p>
+                  </div>
+
+                  {/* Categories */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tool.categoryNamesList
+                      ?.slice(0, 2)
+                      .map((category, catIndex) => (
+                        <Badge
+                          key={catIndex}
+                          variant="secondary"
+                          className="bg-primary/5 text-primary border-primary/20 text-xs"
+                        >
+                          {category}
+                        </Badge>
+                      ))}
+                    {tool.categoryNamesList.length > 2 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{tool.categoryNamesList?.length - 2}
+                      </Badge>
+                    )}
+                  </div>
                   {tool?.planType && (
-                  <p className="text-muted-foreground text-sm font-medium mb-3">
-                    {tool.planType}
-                  </p>
+                    <p className="text-muted-foreground text-sm font-medium mb-3">
+                      {tool.planType}
+                    </p>
                   )}
-                {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
+                  {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <span>{tool.users} users</span>
                   </div>
@@ -205,16 +265,72 @@ const AITools = () => {
                   </div>
                 </div> */}
 
-                {/* View Details Button */}
-                <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
+                  {/* View Details Button */}
                   <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
                     View Details
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                </Link>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
+        </div>
+
+        <div className="ai-summary-pagination max-w-6xl mx-auto">
+          {/* <Pagination
+              defaultCurrent={1}
+              current={currentPage}
+              total={aiToolsPagination?.total}
+              onChange={(val) => {
+                console.log("val", val);
+                handleChangeStatus(val);
+              }}
+              pageSize={10}
+              showSizeChanger={false}
+              // size="small"
+            /> */}
+          {aiToolsPagination && (
+            <div className="flex items-center justify-between ai-pagination-content mt-4">
+              <p className="text-sm text-muted-foreground">
+                Showing{" "}
+                {(aiToolsPagination.page - 1) * aiToolsPagination.limit + 1} to{" "}
+                {Math.min(
+                  aiToolsPagination.page * aiToolsPagination.limit,
+                  aiToolsPagination.total
+                )}{" "}
+                of {aiToolsPagination.total} results
+              </p>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={aiToolsPagination.page === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+
+                <span className="text-sm">
+                  Page {aiToolsPagination.page} of{" "}
+                  {aiToolsPagination?.totalPages}
+                </span>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={
+                    aiToolsPagination.page >= aiToolsPagination?.totalPages
+                  }
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
 
         {aiTools?.length === 0 && (
@@ -226,7 +342,7 @@ const AITools = () => {
               variant="outline"
               onClick={() => {
                 setSearchQuery("");
-                setSelectedCategory("all");
+                setSelectedCategory("");
                 setSelectedPricing("all");
               }}
               className="mt-4"

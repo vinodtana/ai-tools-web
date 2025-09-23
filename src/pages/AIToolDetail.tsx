@@ -26,6 +26,7 @@ import RightSidebar from "@/components/RightSidebar";
 import {
   fetchAIToolDetails,
   fetchAITools,
+  setShowLoginModel,
 } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
@@ -38,10 +39,12 @@ const AIToolDetail = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
 
-  const { cDetails, aiCategories, aiTools } = useAppSelector(
+  const { cDetails, aiCategories, aiTools, user } = useAppSelector(
     (state: any) => state.content
   );
+ 
   console.log("cDetails", cDetails);
+  console.log("user", user);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
     const jsonObj = { page: 1, limit: 50 };
@@ -54,38 +57,13 @@ const AIToolDetail = () => {
   }, [id]);
 
   // Similar tools data
-  const similarTools = [
-    {
-      id: 3,
-      name: "Claude",
-      company: "Anthropic",
-      tagline: "Constitutional AI for safe and helpful assistance",
-      logo: "🧠",
-      planType: "Freemium",
-      rating: 4.7,
-      price: "Free / $20/mo",
-    },
-    {
-      id: 17,
-      name: "Character.AI",
-      company: "Character Technologies",
-      tagline: "Create and chat with AI characters",
-      logo: "🎭",
-      planType: "Freemium",
-      rating: 4.3,
-      price: "Free / $10/mo",
-    },
-    {
-      id: 16,
-      name: "Perplexity AI",
-      company: "Perplexity",
-      tagline: "AI-powered search and research assistant",
-      logo: "🔍",
-      planType: "Freemium",
-      rating: 4.6,
-      price: "Free / $20/mo",
-    },
-  ];
+  const redirectToolUrl = (tUrl: string)=>{
+    if(user?.id){
+      window.open(tUrl, '_blank');
+    }else{
+     dispatch(setShowLoginModel(true));
+    }
+  }
   const allIMages = cDetails?.images?.length ===0 ?[cDetails?.bannerImage || cDetails?.bannerImageTemp, cDetails.logo || cDetails?.logoTemp]: cDetails?.images;
   const nespp =
     "Transform your everyday selfies into professional-quality headshots with Secta AI. In a process that takes under an hour, the advanced algorithms scan through 25 of your chosen photos to produce a multitude of distinctive, professionally styled headshots. Whether you're in a suit or pajamas, the platform eliminates the need for costly studio visits, saving you time and money.<\n\n>This AI platform doesn't just stop at the initial batch; it enables you to create an even broader portfolio of images through the New Photoshoot Tool. This tool allows for an unparalleled level of customization, giving you the power to generate additional headshots in styles that you specifically desire. Whether you're looking for formal attire, casual wear, or specific backdrops, the choices are virtually endless.\n\nBut this offering goes beyond mere convenience. User privacy and data protection are prioritized. Your images are securely stored in a private gallery that only you can access. This gallery is not only a vault but also a curation tool that lets you save your top picks for easy future reference and usage. You have the flexibility to export these images as and when you need them.\n\nAI technology can sometimes yield unpredictable results. That's why Secta AI offers a 100% money-back guarantee for users who aren't satisfied with the outcome, provided they haven't downloaded any images from their gallery. This assures a risk-free experience as you explore the numerous features and benefits this platform has to offer.\n\nThus, Secta AI delivers a trifecta of speed, flexibility, and security, revolutionizing the way you approach photography and personal branding. With hundreds of style combinations at your fingertips, you'll never have to settle for mediocre headshots ever again.";
@@ -241,33 +219,24 @@ const AIToolDetail = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full"
+                          className="w-full cursor-pointer"
                           asChild
+                                                  onClick={() => redirectToolUrl(cDetails?.toolUrl)}
+
                         >
-                          <a
-                            href={cDetails?.toolUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <Globe className="mr-2 h-4 w-4" />
-                            Visit Website
-                          </a>
+                           <span> <Globe className="mr-2 h-4 w-4" />
+                            Visit Website</span>
                         </Button>
                         <br/>
                         <br/>
                      <div>
                           <Button
-                        className="primary-gradient w-100 text-white hover:scale-105 transition-all duration-300"
+                        className="cursor-pointer primary-gradient w-100 text-white hover:scale-105 transition-all duration-300"
                         asChild
+                        onClick={() => redirectToolUrl(cDetails?.toolUrl)}
                       >
-                        <a
-                          href={cDetails.toolUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Try Tool
-                        </a>
+                       <span><ExternalLink className="mr-2 h-4 w-4" />
+                          Try Tool</span>
                       </Button>
                      </div>
                       </div>
@@ -275,7 +244,7 @@ const AIToolDetail = () => {
                   </Card>
                 </div>
               </CardContent>
-               <div className="flex flex-wrap gap-4 p-8">
+               <div className="flex flex-wrap gap-4 p-2">
                        <p
                         dangerouslySetInnerHTML={{
                           __html: cDetails?.overview?.replace(/\n\n/g, "\n\n<br/><br/>"),
@@ -603,6 +572,7 @@ const AIToolDetail = () => {
                       </div>
 
                       {/* Plan Type Badge */}
+                      {similarTool.planType && similarTool.planType!=="nan" && (
                       <div className="flex justify-center mb-4">
                         <Badge
                           variant="secondary"
@@ -611,6 +581,8 @@ const AIToolDetail = () => {
                           {similarTool.planType}
                         </Badge>
                       </div>
+                      )}
+                     
 
                       <div className="flex items-center justify-center pt-4 border-t border-primary/10 mb-4">
                         <div className="text-center">
@@ -619,7 +591,19 @@ const AIToolDetail = () => {
                           </span>
                         </div>
                       </div>
-
+                      <div className="flex flex-wrap gap-2 mb-6">
+                          {similarTool?.categoryNamesList?.map(
+                            (category, index) => (
+                              <Badge
+                                key={index}
+                                variant="secondary"
+                                className="bg-primary/5 text-primary text-transform-capitalize border-primary/20"
+                              >
+                                {category}
+                              </Badge>
+                            )
+                          )}
+                        </div>
                       {/* View Details Button */}
                       <Link
                         to={`/ai-tools/${similarTool?.name?.replace(

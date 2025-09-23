@@ -150,13 +150,13 @@ const Categories = () => {
                             )}
                           </div>
                           <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                            {category.name}
+                            {category.category_name} 
                           </CardTitle>
                           <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p>
                         </CardHeader>
                         <CardContent>
                           <div className="mb-4">
-                            <div className="text-lg font-bold text-primary">{category.toolCount}</div>
+                            <div className="text-lg font-bold text-primary">{category?.tool_count}</div>
                             <div className="text-sm text-muted-foreground">Tools Available</div>
                           </div>
                           
@@ -173,7 +173,7 @@ const Categories = () => {
                             </div>
                           </div>
 
-                          <Link to={`/categories/${category?.name?.replace(/\s+/g, '-')}/${category.id}`}>
+                          <Link to={`/categories/${category?.category_name?.replace(/\s+/g, '-')}/${category.id}`}>
                             <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                               Explore Category
                               <ArrowRight className="ml-2 h-4 w-4" />
