@@ -72,7 +72,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     { name: "ChatGPT Prompts", href: "/chatgpt-prompts", icon: Zap },
     { name: "AI Articles", href: "/ai-articles", icon: FileText },
     { name: "AI News", href: "/ai-news", icon: Newspaper },
-    { name: "AI Influencers", href: "/ai-influencers", icon: Users },
+    // { name: "AI Influencers", href: "/ai-influencers", icon: Users },
     { name: "Categories", href: "/categories", icon: FolderTree },
   ];
 

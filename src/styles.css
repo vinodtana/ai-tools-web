@@ -24,8 +24,20 @@
     justify-content: center;
     display: flex; */
   }
+  .similar-tools-section-content img{
+    max-height: 220px;
+    min-height: 220px;
+    height: 220px;
+    object-fit: contain;
+  }
   .ai-pagination-content{
      margin-top: 20px;
     display: flex;
     justify-content: space-between;
+  }
+  .bg-primary.text-transform-capitalize{
+    color: #fff;
+  }
+  .border-none{
+  border: none !important
   }

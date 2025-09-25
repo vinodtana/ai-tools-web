@@ -116,8 +116,8 @@ console.log("vinod, vinod");
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="login" className="space-y-4">
-            <form onSubmit={handleLogin} className="space-y-4">
+          <TabsContent value="login" className="space-y-4222 border-none">
+            <form onSubmit={handleLogin} className="space-y-4 border-none">
               <div className="space-y-2">
                 <Label htmlFor="login-email">Email</Label>
                 <div className="relative">

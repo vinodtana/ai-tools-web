@@ -60,12 +60,12 @@ const Index = () => {
   const sections = [
     {
       title: 'AI Tools',
-      description: 'Discover 100+ cutting-edge AI tools for every use case',
-      extendedDescription: 'From content creation to data analysis, find the perfect AI tool for your workflow. Our curated collection includes free and premium options across 40+ categories.',
-      features: ['100+ Tools', 'Free & Premium', '40+ Categories', 'Expert Reviews'],
+      description: 'Discover 3000+ cutting-edge AI tools for every use case',
+      extendedDescription: 'From content creation to data analysis, find the perfect AI tool for your workflow. Our curated collection includes free and premium options across 50+ categories.',
+      features: ['3000+ Tools', 'Free & Premium', '50+ Categories', 'Expert Reviews'],
       icon: Bot,
       href: '/ai-tools',
-      count: '100+',
+      count: '3000+',
       gradient: 'from-blue-500 to-purple-600',
       image: aiToolsSection,
     },

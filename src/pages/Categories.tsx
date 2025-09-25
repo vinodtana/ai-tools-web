@@ -52,7 +52,7 @@ const Categories = () => {
   );
   // Mock data for categories
 
-
+console.log("aiCategories", aiCategories);
 
   const getColorClasses = (color: string) => {
     const colorMap = {
@@ -72,6 +72,10 @@ const Categories = () => {
     return colorMap[color as keyof typeof colorMap] || 'border-primary/20';
   };
 
+  const filteredCategories = searchTerm !=="" ? aiCategories?.filter(item =>
+  item.category_name.toLowerCase().includes(searchTerm?.toLowerCase())
+) : aiCategories;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -88,15 +92,7 @@ const Categories = () => {
               </p>
 
               {/* Search */}
-              <div className="relative mb-8">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+             
 
               {/* Quick Stats */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -110,7 +106,7 @@ const Categories = () => {
                   <CardContent className="p-4 text-center">
                     <div className="text-2xl font-bold text-primary">
                       {/* {aiCategories?.reduce((sum, cat) => sum + cat.toolCount, 0)} */}
-                      {aiTools?.length}
+                      {`3590`}
                     </div>
                     <div className="text-sm text-muted-foreground">Total Tools</div>
                   </CardContent>
@@ -122,23 +118,35 @@ const Categories = () => {
                   </CardContent>
                 </Card>
               </div>
+
+               <div className="relative mb-8">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+
+              
             </div>
 
             {/* Featured Categories */}
-            {searchTerm === '' && (
+            {/* {searchTerm === '' && ( */}
               <section className="mb-12">
                 <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                   <Sparkles className="h-6 w-6 text-yellow-500" />
                   Featured Categories
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {aiCategories.map(category => {
+                  {filteredCategories.map(category => {
                     const IconComponent = category.icon;
                     return (
-                      <Card key={category.id} className={`hover:border-primary hover:shadow-2xl hover:scale-105 transition-all duration-500 group overflow-hidden border ${getColorClasses(category.color)}`}>
-                        <div className="h-32 bg-primary/5 flex items-center justify-center">
+                      <Card key={category.id} className={`hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-200 group overflow-hidden border ${getColorClasses(category.color)}`}>
+                        {/* <div className="h-32 bg-primary/5 flex items-center justify-center"> */}
                           {/* <IconComponent className="h-12 w-12 text-primary group-hover:scale-110 transition-transform duration-300" /> */}
-                        </div>
+                        {/* </div> */}
                         <CardHeader>
                           <div className="flex items-center justify-between mb-2">
                             <Badge className="primary-gradient text-white">Featured</Badge>
@@ -149,18 +157,18 @@ const Categories = () => {
                               </Badge>
                             )}
                           </div>
-                          <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                          <CardTitle className="text-xlg group-hover:text-primary transition-colors">
                             {category.category_name} 
                           </CardTitle>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p>
+                          {/* <p className="text-sm text-muted-foreground line-clamp-2">{category.description}</p> */}
                         </CardHeader>
                         <CardContent>
                           <div className="mb-4">
-                            <div className="text-lg font-bold text-primary">{category?.tool_count}</div>
-                            <div className="text-sm text-muted-foreground">Tools Available</div>
+                            {/* <div className="text-lg font-bold text-primary">{category?.tool_count}</div> */}
+                            <div className="text-sm text-muted-foreground">Tools Available: {category?.tool_count}</div>
                           </div>
                           
-                          <div className="space-y-3 mb-4">
+                          {/* <div className="space-y-3 mb-4">
                             <div>
                               <div className="text-xs font-medium text-muted-foreground mb-1">Popular Tools:</div>
                               <div className="flex flex-wrap gap-1">
@@ -171,9 +179,9 @@ const Categories = () => {
                                 ))}
                               </div>
                             </div>
-                          </div>
+                          </div> */}
 
-                          <Link to={`/categories/${category?.category_name?.replace(/\s+/g, '-')}/${category.id}`}>
+                          <Link to={`/ai-category-tools/${category?.category_name?.replace(/\s+/g, '-')}`}>
                             <Button className="w-full primary-gradient text-white hover:scale-105 transition-all duration-300">
                               Explore Category
                               <ArrowRight className="ml-2 h-4 w-4" />
@@ -185,10 +193,10 @@ const Categories = () => {
                   })}
                 </div>
               </section>
-            )}
+            {/* )} */}
 
             {/* All Categories */}
-            <section>
+            {/* <section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">
                   {searchTerm ? `Search Results` : 'All Categories'}
@@ -208,7 +216,6 @@ const Categories = () => {
                       <CardHeader>
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                            {/* <IconComponent className="h-6 w-6 text-primary" /> */}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
@@ -237,7 +244,6 @@ const Categories = () => {
                             <div className="flex flex-wrap gap-1">
                               {category?.useCases?.slice(0, 3).map(useCase => (
                                 <Badge key={useCase} variant="secondary" className="text-xs bg-primary/5 text-primary border-primary/20">
-                                  {/* {useCase} */}
                                   {'useCase'}
                                 </Badge>
                               ))}
@@ -264,7 +270,7 @@ const Categories = () => {
                   <p className="text-muted-foreground">Try adjusting your search terms</p>
                 </div>
               )}
-            </section>
+            </section> */}
           </div>
 
           {/* Right Sidebar */}

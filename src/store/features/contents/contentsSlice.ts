@@ -17,6 +17,9 @@ export const handleLoginAPI = createAsyncThunk('tools/handleLoginAPI', async (bo
 export const checkSocialUserAPI = createAsyncThunk('tools/checkSocialUserAPI', async (body: any) => {
   return await post(`${SERVER_IP}/auth/google`, body);
 });
+export const createClickOut = createAsyncThunk('tools/createClickOut', async (body: any) => {
+  return await post(`${SERVER_IP}/clickouts`, body);
+});
 
 
 export const handlePrifileSave = createAsyncThunk('tools/handlePrifileSave', async (body: any) => {
@@ -33,6 +36,40 @@ export const fetchCategories= createAsyncThunk(
     return response.json();
   }
 );
+export const fetchToolCategories= createAsyncThunk(
+  'aiContents/fetchToolCategories',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    const response = await fetch(`${SERVER_IP}/categories/content-categories?${queryString}`);
+    return response.json();
+  }
+);
+export const fetchPromptCategories= createAsyncThunk(
+  'aiContents/fetchPromptCategories',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    const response = await fetch(`${SERVER_IP}/categories/content-categories?${queryString}`);
+    return response.json();
+  }
+);
+
+export const fetchArticleCategories= createAsyncThunk(
+  'aiContents/fetchArticleCategories',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    const response = await fetch(`${SERVER_IP}/categories/content-categories?${queryString}`);
+    return response.json();
+  }
+);
+export const fetchNewsCategories= createAsyncThunk(
+  'aiContents/fetchNewsCategories',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    const response = await fetch(`${SERVER_IP}/categories/content-categories?${queryString}`);
+    return response.json();
+  }
+);
+
 
 export const fetchAITools= createAsyncThunk(
   'aiContents/fetchTools',
@@ -124,7 +161,12 @@ const initialState: any = {
   totalPages: 1,
   currentPage: 1,
   aiCategories: [],
+  toolCategories: [],
+  promptCategories: [],
+  articleCategories: [],
+  newsCategories: [],
 };
+
 
 const aiContentsSlice = createSlice({
   name: 'aiContents',
@@ -243,6 +285,22 @@ const aiContentsSlice = createSlice({
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false;
         state.aiCategories = action.payload.data || [];
+      })
+       .addCase(fetchToolCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.toolCategories = action.payload.data || [];
+      })
+       .addCase(fetchPromptCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.promptCategories = action.payload.data || [];
+      })
+       .addCase(fetchArticleCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.articleCategories = action.payload.data || [];
+      })
+      .addCase(fetchNewsCategories.fulfilled, (state, action) => {
+        state.loading = false;
+        state.newsCategories = action.payload.data || [];
       })
       .addCase(fetchAIToolDetails.fulfilled, (state, action) => {
         state.loading = false;

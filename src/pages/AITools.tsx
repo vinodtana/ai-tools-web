@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +35,14 @@ import Layout from "@/components/Layout";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAITools } from "../store/features/contents/contentsSlice";
+import {
+  fetchAITools,
+  fetchToolCategories,
+} from "../store/features/contents/contentsSlice";
 import { ITEMS_LIMIT } from "../config";
 
 const AITools = () => {
+  const { category_name } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -48,21 +52,43 @@ const AITools = () => {
   const [selectedPricing, setSelectedPricing] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { aiTools, isLoading, aiToolsPagination, aiCategories } =
-    useAppSelector((state: any) => state.content);
+  const {
+    aiTools,
+    isLoading,
+    aiToolsPagination,
+    aiCategories,
+    toolCategories,
+    promptCategories,
+  } = useAppSelector((state: any) => state.content);
   console.log("aiTools", aiTools);
   console.log("aiToolsPagination", aiToolsPagination);
-  console.log("aiCategories", aiCategories);
+  console.log("toolCategories", toolCategories);
   console.log("selectedCategory", selectedCategory);
+  console.log("category_name", category_name);
 
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
     const jsonObj = { page: currentPage, limit: ITEMS_LIMIT };
     dispatch(fetchAITools(jsonObj));
+    dispatch(
+      fetchToolCategories({
+        page: 1,
+        limit: 100,
+        search: searchQuery,
+        type: "tools",
+      })
+    );
   }, []);
+
   useEffect(() => {
     getAllAIToolsList();
   }, [searchQuery, currentPage, selectedCategory]);
+  useEffect(() => {
+    if (category_name) {
+      setSelectedCategory(category_name?.replace(/-/g, ' '));
+    }
+    getAllAIToolsList();
+  }, [category_name]);
   const getAllAIToolsList = () => {
     const jsonObj = {
       page: currentPage,
@@ -97,19 +123,31 @@ const AITools = () => {
           </p>
         </div>
         <div className="md:text-3xl max-w-6xl mx-auto">
-          <h3 className="font-bold mb-4">Top Categories</h3>
+          <h3 className="font-bold mb-4 text-center">Top Categories</h3>
 
           <div className="text-center">
-              {aiCategories.map((category: any) => (
-              <>{category?.tool_count> 50 && (
-                  <Button onClick={() => setSelectedCategory(category?.category_name)} variant={selectedCategory === category?.category_name ? "default" : "outline"} className="m-2" key={category?.category_name}>{category?.category_name} ({category?.tool_count})</Button> 
-              )
-              }</>
-              ))}
+            {toolCategories.map((category: any) => (
+              <>
+                {category?.tool_count > 50 && (
+                  <Button
+                    onClick={() => setSelectedCategory(category?.category_name)}
+                    variant={
+                      selectedCategory === category?.category_name
+                        ? "default"
+                        : "outline"
+                    }
+                    className="m-2 text-transform-capitalize"
+                    key={category?.category_name}
+                  >
+                    {category?.category_name} ({category?.tool_count})
+                  </Button>
+                )}
+              </>
+            ))}
           </div>
         </div>
         {/* Filters */}
-        <div className="mb-8 flex flex-col sm:flex-row gap-4 max-w-6xl mx-auto">
+        <div className="mb-8 flex flex-col sm:flex-row gap-4 max-w-6xl mx-auto mt-2 ">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -126,7 +164,7 @@ const AITools = () => {
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
-              {aiCategories.map((category: any) => (
+              {toolCategories.map((category: any) => (
                 <SelectItem
                   key={category?.category_name}
                   value={category?.category_name}

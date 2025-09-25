@@ -31,7 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fetchACategoryDetails } from "../store/features/contents/contentsSlice";
 import { useState, useEffect } from "react";
 const CategoryDetail = () => {
-  const { id } = useParams();
+  const { name, id } = useParams();
  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -44,6 +44,7 @@ const CategoryDetail = () => {
     (state: any) => state.content
   );
   console.log("aiTools", aiTools);
+  console.log("name", name);
   console.log("aiCategories", aiCategories);
 
   useEffect(() => {

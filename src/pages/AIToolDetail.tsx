@@ -27,10 +27,12 @@ import {
   fetchAIToolDetails,
   fetchAITools,
   setShowLoginModel,
+  createClickOut,
 } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { triggerMixpanelEvent } from "../Scenes/common";
 
 const AIToolDetail = () => {
   const { id } = useParams();
@@ -42,31 +44,61 @@ const AIToolDetail = () => {
   const { cDetails, aiCategories, aiTools, user } = useAppSelector(
     (state: any) => state.content
   );
- 
+
   console.log("cDetails", cDetails);
   console.log("user", user);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
     const jsonObj = { page: 1, limit: 50 };
-    dispatch(fetchAITools(jsonObj));
+    // dispatch(fetchAITools(jsonObj));
   }, []);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
     const jsonObj = { page: 1, limit: 50 };
-    dispatch(fetchAITools(jsonObj));
+    // dispatch(fetchAITools(jsonObj));
   }, [id]);
-
-  // Similar tools data
-  const redirectToolUrl = (tUrl: string)=>{
-    if(user?.id){
-      window.open(tUrl, '_blank');
-    }else{
-     dispatch(setShowLoginModel(true));
+  useEffect(() => {
+    if (cDetails?.categoryNamesList?.length > 0) {
+      const jsonObj = {
+        page: 1,
+        limit: 50,
+        category_name: cDetails?.categoryNamesList?.[0],
+      };
+      dispatch(fetchAITools(jsonObj));
     }
-  }
-  const allIMages = cDetails?.images?.length ===0 ?[cDetails?.bannerImage || cDetails?.bannerImageTemp, cDetails.logo || cDetails?.logoTemp]: cDetails?.images;
-  const nespp =
-    "Transform your everyday selfies into professional-quality headshots with Secta AI. In a process that takes under an hour, the advanced algorithms scan through 25 of your chosen photos to produce a multitude of distinctive, professionally styled headshots. Whether you're in a suit or pajamas, the platform eliminates the need for costly studio visits, saving you time and money.<\n\n>This AI platform doesn't just stop at the initial batch; it enables you to create an even broader portfolio of images through the New Photoshoot Tool. This tool allows for an unparalleled level of customization, giving you the power to generate additional headshots in styles that you specifically desire. Whether you're looking for formal attire, casual wear, or specific backdrops, the choices are virtually endless.\n\nBut this offering goes beyond mere convenience. User privacy and data protection are prioritized. Your images are securely stored in a private gallery that only you can access. This gallery is not only a vault but also a curation tool that lets you save your top picks for easy future reference and usage. You have the flexibility to export these images as and when you need them.\n\nAI technology can sometimes yield unpredictable results. That's why Secta AI offers a 100% money-back guarantee for users who aren't satisfied with the outcome, provided they haven't downloaded any images from their gallery. This assures a risk-free experience as you explore the numerous features and benefits this platform has to offer.\n\nThus, Secta AI delivers a trifecta of speed, flexibility, and security, revolutionizing the way you approach photography and personal branding. With hundreds of style combinations at your fingertips, you'll never have to settle for mediocre headshots ever again.";
+  }, [cDetails]);
+  // Similar tools data
+  const redirectToolUrl = (tUrl: string) => {
+    if (user?.id) {
+      triggerMixpanelEvent("click_tool_url", { tool_url: tUrl });
+      if (tUrl) {
+        const clickOutData = {
+          user_id: user?.id,
+          content_id: cDetails?.id,
+          redirect_url: tUrl,
+          type: "tools",
+        };
+        dispatch(createClickOut(clickOutData));
+        window.open(tUrl, "_blank");
+      } else if (cDetails?.name) {
+        window.open(
+          `https://www.google.com/search?q=${cDetails?.name}`,
+          "_blank"
+        );
+      }
+    } else {
+      dispatch(setShowLoginModel(true));
+    }
+  };
+  const allIMages =
+    cDetails?.images?.length === 0
+      ? [
+          cDetails?.bannerImage ||
+            cDetails?.bannerImageTemp ||
+            cDetails.logo ||
+            cDetails?.logoTemp,
+        ]
+      : cDetails?.images;
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -146,22 +178,16 @@ const AIToolDetail = () => {
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground leading-relaxed mb-6">
-                      <a
-                        target="_blank"
-                        href={cDetails.toolUrl}
-                        className="underline hover:text-primary transition-colors"
-                      >
-                        <img
-                          src={cDetails?.bannerImage || cDetails?.bannerImageTemp}
-                          alt={cDetails?.name}
-                          className="w-full h-auto mb-4 rounded-lg"
-                        />{" "}
-                      </a>
-                     
+                    <p
+                      className="text-muted-foreground leading-relaxed cursor-pointer mb-6"
+                      onClick={() => redirectToolUrl(cDetails?.toolUrl)}
+                    >
+                      <img
+                        src={cDetails?.bannerImage || cDetails?.bannerImageTemp}
+                        alt={cDetails?.name}
+                        className="w-full h-auto mb-4 rounded-lg"
+                      />{" "}
                     </p>
-
-                   
                   </div>
 
                   {/* Sidebar Info */}
@@ -221,58 +247,62 @@ const AIToolDetail = () => {
                           size="sm"
                           className="w-full cursor-pointer"
                           asChild
-                                                  onClick={() => redirectToolUrl(cDetails?.toolUrl)}
-
+                          onClick={() => redirectToolUrl(cDetails?.toolUrl)}
                         >
-                           <span> <Globe className="mr-2 h-4 w-4" />
-                            Visit Website</span>
+                          <span>
+                            {" "}
+                            <Globe className="mr-2 h-4 w-4" />
+                            Visit Website
+                          </span>
                         </Button>
-                        <br/>
-                        <br/>
-                     <div>
+                        <br />
+                        <br />
+                        <div>
                           <Button
-                        className="cursor-pointer primary-gradient w-100 text-white hover:scale-105 transition-all duration-300"
-                        asChild
-                        onClick={() => redirectToolUrl(cDetails?.toolUrl)}
-                      >
-                       <span><ExternalLink className="mr-2 h-4 w-4" />
-                          Try Tool</span>
-                      </Button>
-                     </div>
+                            className="cursor-pointer primary-gradient w-100 text-white hover:scale-105 transition-all duration-300"
+                            asChild
+                            onClick={() => redirectToolUrl(cDetails?.toolUrl)}
+                          >
+                            <span>
+                              <ExternalLink className="mr-2 h-4 w-4" />
+                              Try Tool
+                            </span>
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
               </CardContent>
-               <div className="flex flex-wrap gap-4 p-2">
-                       <p
-                        dangerouslySetInnerHTML={{
-                          __html: cDetails?.overview?.replace(/\n\n/g, "\n\n<br/><br/>"),
-                        }}
-                      ></p>
-                      <Button
-                        className="primary-gradient text-white hover:scale-105 transition-all duration-300"
-                        asChild
-                      >
-                        <a
-                          href={cDetails.toolUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          Try Tool
-                        </a>
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="hover:bg-primary hover:text-white transition-all duration-200"
-                      >
-                        <Share2 className="mr-2 h-4 w-4" />
-                        Share Tool
-                      </Button>
-                    </div>
+              <div className="flex flex-wrap gap-4 p-2">
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: cDetails?.overview?.replace(
+                      /\n\n/g,
+                      "\n\n<br/><br/>"
+                    ),
+                  }}
+                ></p>
+                <Button
+                  className="primary-gradient text-white hover:scale-105 transition-all duration-300"
+                  asChild
+                  onClick={() => redirectToolUrl(cDetails?.toolUrl)}
+                >
+                  <span>
+                    <ExternalLink className="mr-2 h-4 w-4" />
+                    Try Tool
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="hover:bg-primary hover:text-white transition-all duration-200"
+                >
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share Tool
+                </Button>
+              </div>
             </Card>
-            
+
             {/* Detailed Information Tabs */}
             <Card className="hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-500">
               <CardContent className="p-8">
@@ -291,62 +321,65 @@ const AIToolDetail = () => {
                       <p className="text-muted-foreground leading-relaxed mb-6">
                         <p
                           dangerouslySetInnerHTML={{
-                            __html: cDetails.overview?.replace(/\n\n/g, "\n\n<br/><br/>"),
+                            __html: cDetails.overview?.replace(
+                              /\n\n/g,
+                              "\n\n<br/><br/>"
+                            ),
                           }}
                         ></p>
                       </p>
                       {cDetails?.description && (
-                      <div>
-                        <h4 className="text-lg font-semibold mb-3">
-                          Description
-                        </h4>
-                        <div className="text-muted-foreground whitespace-pre-line leading-relaxed">
-                          <p
-                            dangerouslySetInnerHTML={{
-                              __html: cDetails?.description,
-                            }}
-                          ></p>
+                        <div>
+                          <h4 className="text-lg font-semibold mb-3">
+                            Description
+                          </h4>
+                          <div className="text-muted-foreground whitespace-pre-line leading-relaxed">
+                            <p
+                              dangerouslySetInnerHTML={{
+                                __html: cDetails?.description,
+                              }}
+                            ></p>
+                          </div>
                         </div>
-                      </div>
                       )}
-                      
                     </div>
                     {cDetails?.features?.length > 0 && (
                       <div>
-                      <h3 className="text-2xl font-bold mb-4">Features: </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {cDetails?.features?.map((feature, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-3 p-4 rounded-lg border hover:border-primary transition-colors"
-                          >
-                            <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                            <span>{feature}</span>
-                          </div>
-                        ))}
+                        <h3 className="text-2xl font-bold mb-4">Features: </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {cDetails?.features?.map((feature, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 p-4 rounded-lg border hover:border-primary transition-colors"
+                            >
+                              <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
                     )}
-                    
+
                     {cDetails?.useCases?.length > 0 && (
                       <div>
-                      <h3 className="text-2xl font-bold mb-4">Use Cases: </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {cDetails?.useCases?.map((useCase, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center gap-3 p-4 rounded-lg border hover:border-primary transition-colors"
-                          >
-                            <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                            <span>{useCase}</span>
-                          </div>
-                        ))}
+                        <h3 className="text-2xl font-bold mb-4">Use Cases: </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {cDetails?.useCases?.map((useCase, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center gap-3 p-4 rounded-lg border hover:border-primary transition-colors"
+                            >
+                              <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                              <span>{useCase}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
                     )}
-                   
-                    {cDetails?.toolPros?.length > 0 && (<>
-                     <h3 className="text-xl font-bold mb-4 text-green-600">
+
+                    {cDetails?.toolPros?.length > 0 && (
+                      <>
+                        <h3 className="text-xl font-bold mb-4 text-green-600">
                           Pros:
                         </h3>
                         <div className="space-y-3">
@@ -363,12 +396,13 @@ const AIToolDetail = () => {
                               )}
                             </>
                           ))}
-                          </div>
-                    </> )}
-                   
-                          {cDetails?.toolCons?.length > 0 && (
-                            <>
-                            <h3 className="text-xl font-bold mb-4 text-green-600">
+                        </div>
+                      </>
+                    )}
+
+                    {cDetails?.toolCons?.length > 0 && (
+                      <>
+                        <h3 className="text-xl font-bold mb-4 text-green-600">
                           Cons:
                         </h3>
                         <div className="space-y-3">
@@ -385,9 +419,40 @@ const AIToolDetail = () => {
                               )}
                             </>
                           ))}
-                        </div></>
-                          )}
-                           
+                        </div>
+                      </>
+                    )}
+                    {allIMages?.length > 0 && (
+                      <div>
+                        <h3 className="text-2xl font-bold mb-4">
+                          Screenshots & Media
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {allIMages?.map((image, index) => (
+                            <Card
+                              key={index}
+                              className="group hover:border-primary hover:scale-105 transition-all duration-300"
+                            >
+                              <CardContent className="p-4">
+                                <div className="aspect-video bg-muted rounded-lg mb-3 flex items-center justify-center">
+                                  <img
+                                    src={image}
+                                    alt={`Screenshot ${index + 1}`}
+                                    className="object-cover w-full h-full rounded-lg"
+                                  />
+                                </div>
+                                <h4 className="font-medium">
+                                  Screenshot {index + 1}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Tool Interface
+                                </p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </TabsContent>
 
                   <TabsContent value="features" className="space-y-6">
@@ -531,7 +596,7 @@ const AIToolDetail = () => {
               </p>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 similar-tools-section-content">
                 {aiTools?.map((similarTool, index) => (
                   <Card
                     key={similarTool.id}
@@ -539,9 +604,15 @@ const AIToolDetail = () => {
                   >
                     {/* Tool Logo/Icon */}
                     <div className="relative h-32-test flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
-                      <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
+                      <div className="text-4xl group-hover:scale-110-111 transition-transform-111 duration-300-111">
                         {" "}
-                        <img src={similarTool.bannerImage || similarTool?.bannerImageTemp || similarTool?.logoTemp} />{" "}
+                        <img
+                          src={
+                            similarTool.bannerImage ||
+                            similarTool?.bannerImageTemp ||
+                            similarTool?.logoTemp
+                          }
+                        />{" "}
                       </div>
                       <div className="absolute top-4 right-4">
                         <Badge className="primary-gradient text-white shadow-lg">
@@ -572,38 +643,38 @@ const AIToolDetail = () => {
                       </div>
 
                       {/* Plan Type Badge */}
-                      {similarTool.planType && similarTool.planType!=="nan" && (
-                      <div className="flex justify-center mb-4">
-                        <Badge
-                          variant="secondary"
-                          className="bg-primary/5 text-primary border-primary/20 text-xs"
-                        >
-                          {similarTool.planType}
-                        </Badge>
-                      </div>
-                      )}
-                     
+                      {similarTool.planType &&
+                        similarTool.planType !== "nan" && (
+                          <div className="flex justify-center mb-4">
+                            <Badge
+                              variant="secondary"
+                              className="bg-primary/5 text-primary border-primary/20 text-xs"
+                            >
+                              {similarTool.planType}
+                            </Badge>
+                          </div>
+                        )}
 
-                      <div className="flex items-center justify-center pt-4 border-t border-primary/10 mb-4">
+                      {/* <div className="flex items-center justify-center pt-4 border-t border-primary/10 mb-4">
                         <div className="text-center">
                           <span className="font-medium text-primary text-sm">
                             {similarTool.price}
                           </span>
                         </div>
-                      </div>
+                      </div> */}
                       <div className="flex flex-wrap gap-2 mb-6">
-                          {similarTool?.categoryNamesList?.map(
-                            (category, index) => (
-                              <Badge
-                                key={index}
-                                variant="secondary"
-                                className="bg-primary/5 text-primary text-transform-capitalize border-primary/20"
-                              >
-                                {category}
-                              </Badge>
-                            )
-                          )}
-                        </div>
+                        {similarTool?.categoryNamesList?.map(
+                          (category, index) => (
+                            <Badge
+                              key={index}
+                              variant="secondary"
+                              className="bg-primary/5 text-primary text-transform-capitalize border-primary/20"
+                            >
+                              {category}
+                            </Badge>
+                          )
+                        )}
+                      </div>
                       {/* View Details Button */}
                       <Link
                         to={`/ai-tools/${similarTool?.name?.replace(

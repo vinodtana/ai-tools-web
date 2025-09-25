@@ -26,12 +26,13 @@ const SimilarItemCard = ({ item, linkTo, type }: any) => {
   const defaultStyle = getDefaultImage();
 
   const renderPromptCard = () => (
+    <Link to={`/chatgpt-prompts/${item?.name?.replace(/\s+/g, '-')}/${item.id}`}>
     <Card className="group hover:bg-transparent hover:border-primary hover:shadow-2xl transition-all duration-500 animate-fade-in overflow-hidden hover:scale-105">
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
-        {item.image ? (
+        {item?.bannerImage || item?.bannerImageTemp ? (
           <img 
-            src={item.image} 
+            src={item?.bannerImage || item?.bannerImageTemp} 
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
@@ -53,11 +54,11 @@ const SimilarItemCard = ({ item, linkTo, type }: any) => {
       
       <CardContent className="p-6">
         <div className="mb-4">
-          <div className="flex items-center gap-3 mb-3">
+          {/* <div className="flex items-center gap-3 mb-3">
             <Badge variant="secondary" className="bg-primary/5 text-primary border-primary/20">
               {item.category}
             </Badge>
-          </div>
+          </div> */}
           <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{item.name}</h3>
           {item.tagline && (
             <p className="text-muted-foreground text-sm leading-relaxed">{item.tagline}</p>
@@ -80,6 +81,7 @@ const SimilarItemCard = ({ item, linkTo, type }: any) => {
                         </Link>
       </CardContent>
     </Card>
+    </Link>
   );
 
   const renderArticleCard = () => (

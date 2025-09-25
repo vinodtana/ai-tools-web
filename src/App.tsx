@@ -41,6 +41,7 @@ const App = () => (
           
           {/* AI Tools Routes */}
           <Route path="/ai-tools" element={<AITools />} />
+          <Route path="/ai-category-tools/:category_name" element={<AITools />} />
           <Route path="/ai-tools/:id" element={<AIToolDetail />} />
           <Route path="/ai-tools/:name/:id" element={<AIToolDetail />} />
           
@@ -66,7 +67,7 @@ const App = () => (
           
           {/* Categories Routes */}
           <Route path="/categories" element={<Categories />} />
-          <Route path="/categories/:id" element={<CategoryDetail />} />
+          <Route path="/categories/:name" element={<CategoryDetail />} />
           <Route path="/categories/:name/:id" element={<CategoryDetail />} />
           
           {/* Additional Pages */}

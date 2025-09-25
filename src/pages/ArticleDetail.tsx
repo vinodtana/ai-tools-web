@@ -1,26 +1,29 @@
-import { useParams, Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  User, 
-  Clock, 
+import { useParams, Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowLeft,
+  Calendar,
+  User,
+  Clock,
   Share2,
   BookOpen,
   Heart,
   MessageCircle,
-  Eye
-} from 'lucide-react';
-import Layout from '@/components/Layout';
-import RightSidebar from '@/components/RightSidebar';
-import SimilarItemCard from '@/components/SimilarItemCard';
-import { fetchAIToolDetails, fetchAIArticles } from "../store/features/contents/contentsSlice";
+  Eye,
+} from "lucide-react";
+import Layout from "@/components/Layout";
+import RightSidebar from "@/components/RightSidebar";
+import SimilarItemCard from "@/components/SimilarItemCard";
+import {
+  fetchAIToolDetails,
+  fetchAIArticles,
+} from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 const ArticleDetail = () => {
   const { id } = useParams();
 
@@ -28,20 +31,26 @@ const ArticleDetail = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
 
-
-  const {  cDetails, aiCategories, aIArticles } = useAppSelector(
+  const { cDetails, aiCategories, aIArticles } = useAppSelector(
     (state: any) => state.content
   );
-console.log("cDetails", cDetails);
- useEffect(() => {
+  console.log("cDetails", cDetails);
+  useEffect(() => {
     dispatch(fetchAIToolDetails(id));
-    const jsonObj = { page: 1, limit: 50 };
-        dispatch(fetchAIArticles(jsonObj));
-  }, []);
+  }, [id]);
 
-  
+  useEffect(() => {
+    if (cDetails?.categoryNamesList?.length > 0) {
+      const jsonObj = {
+        page: 1,
+        limit: 50,
+        category_name: cDetails?.categoryNamesList?.[0],
+      };
+      dispatch(fetchAIArticles(jsonObj));
+    }
+  }, [cDetails?.id]);
+
   // Mock article data
-
 
   return (
     <Layout>
@@ -52,7 +61,10 @@ console.log("cDetails", cDetails);
             {/* Back Button */}
             <div className="mb-8">
               <Link to="/ai-articles">
-                <Button variant="outline" className="group hover:bg-primary hover:text-white transition-all duration-200">
+                <Button
+                  variant="outline"
+                  className="group hover:bg-primary hover:text-white transition-all duration-200"
+                >
                   <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
                   Back to Articles
                 </Button>
@@ -72,6 +84,11 @@ console.log("cDetails", cDetails);
                   <p className="text-xl text-muted-foreground mb-6">
                     {cDetails.tagline}
                   </p>
+                  <img
+                    src={cDetails?.bannerImage || cDetails?.bannerImageTemp}
+                    alt={cDetails?.name}
+                    className="w-full h-auto mb-4 rounded-lg"
+                  />{" "}
                 </div>
 
                 {/* Article Meta */}
@@ -82,25 +99,30 @@ console.log("cDetails", cDetails);
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
-                    <span>{new Date(cDetails.createdAt).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(cDetails.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span>{cDetails?.readTime || `5 mins`}</span>
                   </div>
                   {cDetails.views && (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                       <Eye className="h-4 w-4" />
                       <span>{cDetails.views} views</span>
-                      </div>
+                    </div>
                   )}
-                 
                 </div>
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-6">
                   {cDetails?.tags?.map((tag, index) => (
-                    <Badge key={index} variant="secondary" className="bg-primary/5 text-primary border-primary/20">
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-primary/5 text-primary border-primary/20"
+                    >
                       {tag}
                     </Badge>
                   ))}
@@ -108,17 +130,29 @@ console.log("cDetails", cDetails);
 
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4">
-                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button
+                    disabled
+                    variant="outline"
+                    className="hover:bg-primary hover:text-white transition-all duration-200"
+                  >
                     <Heart className="mr-2 h-4 w-4" />
-                    Like 
+                    Like
                     {/* ({cDetails.likes}) */}
                   </Button>
-                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button
+                    disabled
+                    variant="outline"
+                    className="hover:bg-primary hover:text-white transition-all duration-200"
+                  >
                     <MessageCircle className="mr-2 h-4 w-4" />
-                    Comments 
+                    Comments
                     {/* ({cDetails.comments}) */}
                   </Button>
-                  <Button disabled variant="outline" className="hover:bg-primary hover:text-white transition-all duration-200">
+                  <Button
+                    disabled
+                    variant="outline"
+                    className="hover:bg-primary hover:text-white transition-all duration-200"
+                  >
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
                   </Button>
@@ -131,12 +165,19 @@ console.log("cDetails", cDetails);
               <CardContent className="p-8">
                 <div className="prose prose-lg max-w-none dark:prose-invert">
                   <div className="whitespace-pre-line leading-relaxed">
-                
-                    <p
-                                  dangerouslySetInnerHTML={{
-                                    __html: cDetails.overview,
-                                  }}
-                                ></p>
+                    {cDetails?.overviewList?.map((overText) => {
+                      return (
+                        <p
+                          className="mb-5"
+                          dangerouslySetInnerHTML={{
+                            __html: overText?.replace(
+                              /\n\n/g,
+                              "\n\n<br/><br/>"
+                            ),
+                          }}
+                        ></p>
+                      );
+                    })}
                   </div>
                 </div>
               </CardContent>
@@ -144,27 +185,33 @@ console.log("cDetails", cDetails);
 
             {/* Author Bio */}
             {cDetails.authorBy && (
-
-          
-            <Card className="mb-8">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <User className="h-8 w-8 text-primary" />
+              <Card className="mb-8">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                      <User className="h-8 w-8 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold mb-2">
+                        About the Author
+                      </h3>
+                      <p className="font-semibold text-primary mb-2">
+                        Name: {cDetails.authorBy}
+                      </p>
+                      <p className="font-semibold text-primary mb-2">
+                        Location: {cDetails.authorLocation}
+                      </p>
+                      <p className="font-semibold text-primary mb-2">
+                        Role: {cDetails.authorRole}
+                      </p>
+                      <p className="text-muted-foreground">
+                        {cDetails.authorBio}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-2">About the Author</h3>
-                    <p className="font-semibold text-primary mb-2">Name: {cDetails.authorBy}</p>
-                    <p className="font-semibold text-primary mb-2">Location: {cDetails.authorLocation}</p>
-                    <p className="font-semibold text-primary mb-2">Role: {cDetails.authorRole}</p>
-                    <p className="text-muted-foreground">
-                      {cDetails.authorBio}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           {/* Right Sidebar */}
@@ -185,7 +232,10 @@ console.log("cDetails", cDetails);
                   <SimilarItemCard
                     key={index}
                     item={similarArticle}
-                    linkTo={`/ai-articles/${similarArticle?.name?.replace(/\s+/g, '-')}/${similarArticle.id}`}
+                    linkTo={`/ai-articles/${similarArticle?.name?.replace(
+                      /\s+/g,
+                      "-"
+                    )}/${similarArticle.id}`}
                     type="article"
                   />
                 ))}
