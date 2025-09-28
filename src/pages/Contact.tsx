@@ -19,6 +19,10 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+
+  const { cDetails, aiCategories, aiTools, user } = useAppSelector(
+    (state: any) => state.content
+  );  
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -29,7 +33,7 @@ const Contact = () => {
   const handleSubmit =async (e: React.FormEvent) => {
     e.preventDefault();
     if(formData.name && formData.email && formData.subject && formData.message) {
-      await dispatch(getInTouchAPI({ email: formData.email, name: formData.name, subject: formData.subject, message: formData.message }));  
+      await dispatch(getInTouchAPI({ email: formData.email, name: formData.name, subject: formData.subject, message: formData.message, user_id: user?.id || null }));  
       // Here you would typically handle the form submission, e.g., send the data to your server
       console.log('Form submitted:', formData);
       setFormData({

@@ -81,8 +81,16 @@ const AIToolDetail = () => {
         dispatch(createClickOut(clickOutData));
         window.open(tUrl, "_blank");
       } else if (cDetails?.name) {
+        const nnurl = `https://www.google.com/search?q=${encodeURIComponent(cDetails?.name)}`;
+        const clickOutData = {
+          user_id: user?.id,
+          content_id: cDetails?.id,
+          redirect_url: nnurl,
+          type: "tools",
+        };
+        dispatch(createClickOut(clickOutData));
         window.open(
-          `https://www.google.com/search?q=${cDetails?.name}`,
+         nnurl,
           "_blank"
         );
       }
