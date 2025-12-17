@@ -105,7 +105,7 @@ const ToolCard = (props: any) => {
             <div className="absolute top-4 left-4">
               <Badge className="primary-gradient text-white shadow-lg">
                 <Star className="h-3 w-3 mr-1" />
-                {tool.rating}
+                {tool.rating !== "0.0" ? tool.rating : ""}
               </Badge>
             </div>
             <div
@@ -169,7 +169,7 @@ const ToolCard = (props: any) => {
                 <Badge
                   key={catIndex}
                   variant="secondary"
-                  className="bg-primary/5 text-primary border-primary/20 text-xs"
+                  className="bg-primary/5 text-primary border-primary/20 text-xs capitalize"
                 >
                   {category}
                 </Badge>
@@ -181,7 +181,7 @@ const ToolCard = (props: any) => {
               )}
             </div>
             {tool?.planType && (
-              <p className="text-muted-foreground text-sm font-medium mb-3">
+              <p className="text-muted-foreground text-sm font-medium mb-3 capitalize">
                 {tool.planType}
               </p>
             )}

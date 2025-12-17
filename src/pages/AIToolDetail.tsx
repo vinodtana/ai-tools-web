@@ -38,6 +38,7 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { triggerMixpanelEvent } from "../Scenes/common";
 import CommentSection from "@/components/CommentSection";
+import ShareModal from "@/components/Common/ShareModal";
 
 const AIToolDetail = () => {
   const { id } = useParams();
@@ -46,6 +47,8 @@ const AIToolDetail = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [openShareModel, setOpenShareModel] = useState(false);
+  const shareURL = window.location.href;
 
   const { cDetails, aiCategories, aiTools, user, userContentLikes } =
     useAppSelector((state: any) => state.content);
@@ -151,6 +154,28 @@ const AIToolDetail = () => {
   );
   return (
     <Layout>
+      <ShareModal
+
+show={openShareModel}
+
+url={shareURL}
+
+title="Share on"
+
+handleClose={() => {
+
+setOpenShareModel(false);
+
+}}
+
+onCopyClick={() => {
+
+navigator.clipboard.writeText(shareURL);
+
+}}
+
+/>
+
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}
@@ -333,14 +358,11 @@ const AIToolDetail = () => {
                         <br />
                         <div>
                           <Button
-                            className="cursor-pointer primary-gradient w-100 text-white hover:scale-105 transition-all duration-300"
-                            asChild
+                            className="cursor-pointer primary-gradient w-full text-white hover:scale-105 transition-all duration-300"
                             onClick={() => redirectToolUrl(cDetails?.toolUrl)}
                           >
-                            <span>
-                              <ExternalLink className="mr-2 h-4 w-4" />
-                              Try Tool
-                            </span>
+                            <ExternalLink className="mr-2 h-4 w-4" />
+                            Try Tool
                           </Button>
                         </div>
                       </div>
@@ -369,6 +391,7 @@ const AIToolDetail = () => {
                 </Button>
                 <Button
                   variant="outline"
+                  onClick={() => setOpenShareModel(true)}
                   className="hover:bg-primary hover:text-white transition-all duration-200"
                 >
                   <Share2 className="mr-2 h-4 w-4" />

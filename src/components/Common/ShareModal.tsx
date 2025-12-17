@@ -15,20 +15,38 @@ type ShareModalProps = {
   className?: string;
   buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link";
   buttonLabel?: string;
+  show?: boolean;
+  handleClose?: () => void;
+  url?: string;
+  title?: string;
+  onCopyClick?: () => void;
 };
 
 const ShareModal: React.FC<ShareModalProps> = ({
   className,
   buttonVariant = "outline",
   buttonLabel = "Share",
+  show,
+  handleClose,
+  url,
+  title = "Share this page",
+  onCopyClick,
 }) => {
-  const shareUrl = useMemo(() => {
+  const defaultUrl = useMemo(() => {
     if (typeof window !== "undefined") return window.location.href;
     return "";
   }, []);
 
+  const shareUrl = url || defaultUrl;
+
   const [copied, setCopied] = useState(false);
   const copyToClipboard = async () => {
+    if (onCopyClick) {
+      onCopyClick();
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+      return;
+    }
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
@@ -42,28 +60,36 @@ const ShareModal: React.FC<ShareModalProps> = ({
     {
       key: "facebook",
       label: "Facebook",
-      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        shareUrl
+      )}`,
       bg: "bg-[#1877F2]",
       iconSrc: "https://cdn.simpleicons.org/facebook/FFFFFF",
     },
     {
       key: "twitter",
       label: "Twitter",
-      href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}`,
+      href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(
+        shareUrl
+      )}`,
       bg: "bg-[#1DA1F2]",
       iconSrc: "https://cdn.simpleicons.org/twitter/FFFFFF",
     },
     {
       key: "linkedin",
       label: "LinkedIn",
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+      href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        shareUrl
+      )}`,
       bg: "bg-[#0A66C2]",
       iconSrc: "https://cdn.simpleicons.org/linkedin/FFFFFF",
     },
     {
       key: "whatsapp",
       label: "WhatsApp",
-      href: `https://api.whatsapp.com/send?text=${encodeURIComponent(shareUrl)}`,
+      href: `https://api.whatsapp.com/send?text=${encodeURIComponent(
+        shareUrl
+      )}`,
       bg: "bg-[#25D366]",
       iconSrc: "https://cdn.simpleicons.org/whatsapp/FFFFFF",
     },
@@ -77,35 +103,48 @@ const ShareModal: React.FC<ShareModalProps> = ({
     {
       key: "reddit",
       label: "Reddit",
-      href: `https://www.reddit.com/submit?url=${encodeURIComponent(shareUrl)}`,
+      href: `https://www.reddit.com/submit?url=${encodeURIComponent(
+        shareUrl
+      )}`,
       bg: "bg-[#FF4500]",
       iconSrc: "https://cdn.simpleicons.org/reddit/FFFFFF",
     },
     {
       key: "email",
       label: "Email",
-      href: `mailto:?subject=${encodeURIComponent("Check this out")}&body=${encodeURIComponent(shareUrl)}`,
+      href: `mailto:?subject=${encodeURIComponent(
+        "Check this out"
+      )}&body=${encodeURIComponent(shareUrl)}`,
       bg: "bg-gray-600",
       iconSrc: "",
     },
   ];
 
+  const isControlled = typeof show !== "undefined";
+
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button
-          variant={buttonVariant}
-          className={className || "border border-black text-black hover:bg-black/5"}
-          aria-label="Share"
-          title="Share"
-        >
-          <Share2 className="w-4 h-4 mr-2" />
-          {buttonLabel}
-        </Button>
-      </DialogTrigger>
+    <Dialog
+      open={isControlled ? show : undefined}
+      onOpenChange={isControlled ? (open) => !open && handleClose?.() : undefined}
+    >
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button
+            variant={buttonVariant}
+            className={
+              className || "border border-black text-black hover:bg-black/5"
+            }
+            aria-label="Share"
+            title="Share"
+          >
+            <Share2 className="w-4 h-4 mr-2" />
+            {buttonLabel}
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Share this page</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             Choose a platform to share the current URL.
           </DialogDescription>

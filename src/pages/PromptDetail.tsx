@@ -20,6 +20,7 @@ import Layout from "@/components/Layout";
 import RightSidebar from "@/components/RightSidebar";
 import SimilarItemCard from "@/components/SimilarItemCard";
 import CommentSection from "@/components/CommentSection";
+import ShareModal from "@/components/Common/ShareModal";
 import {
   fetchAIToolDetails,
   fetchAIPromots,
@@ -36,6 +37,8 @@ const PromptDetail = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const [openShareModel, setOpenShareModel] = useState(false);
+  const shareURL = window.location.href;
 
   const { cDetails, aiCategories, aIPromots, promptCategories, user } =
     useAppSelector((state: any) => state.content);
@@ -183,10 +186,22 @@ const PromptDetail = () => {
                   <Button
                     variant="outline"
                     className="hover:bg-primary hover:text-white transition-all duration-200"
+                    onClick={() => setOpenShareModel(true)}
                   >
                     <Share2 className="mr-2 h-4 w-4" />
                     Share Prompt
                   </Button>
+                  <ShareModal
+                    show={openShareModel}
+                    url={shareURL}
+                    title="Share on"
+                    handleClose={() => {
+                      setOpenShareModel(false);
+                    }}
+                    onCopyClick={() => {
+                      navigator.clipboard.writeText(shareURL);
+                    }}
+                  />
                 </div>
               </CardContent>
             </Card>

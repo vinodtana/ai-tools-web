@@ -28,6 +28,7 @@ import {
   setShowLoginModel,
 } from "../store/features/contents/contentsSlice";
 import { triggerMixpanelEvent } from "../Scenes/common";
+import ShareModal from "@/components/Common/ShareModal";
 
 const AINews = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,6 +39,8 @@ const AINews = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPricing, setSelectedPricing] = useState("all");
+  const [openShareModel, setOpenShareModel] = useState(false);
+  const [shareURL, setShareURL] = useState("");
 
   const { aINews, isLoading, pagination, newsCategories, user } =
     useAppSelector((state: any) => state.content);
@@ -214,7 +217,14 @@ const AINews = () => {
                                 </div>
 
                                 <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      setShareURL(item.newslink);
+                                      setOpenShareModel(true);
+                                    }}
+                                  >
                                     <Share2 className="h-4 w-4 mr-2" />
                                     Share
                                   </Button>
@@ -465,6 +475,17 @@ const AINews = () => {
           </div>
         </div>
       </div>
+      <ShareModal
+        show={openShareModel}
+        url={shareURL}
+        title="Share on"
+        handleClose={() => {
+          setOpenShareModel(false);
+        }}
+        onCopyClick={() => {
+          navigator.clipboard.writeText(shareURL);
+        }}
+      />
     </Layout>
   );
 };

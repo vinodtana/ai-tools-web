@@ -247,7 +247,7 @@ const Index = () => {
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                     <Zap className="h-4 w-4 text-primary" />
                   </div>
-                  <span>100+ AI Tools</span>
+                  <span>3000+ AI Tools</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">

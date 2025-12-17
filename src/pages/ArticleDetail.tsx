@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,27 +17,43 @@ import {
 import Layout from "@/components/Layout";
 import RightSidebar from "@/components/RightSidebar";
 import SimilarItemCard from "@/components/SimilarItemCard";
+import CommentSection from "@/components/CommentSection";
+import ShareModal from "@/components/Common/ShareModal";
 import {
   fetchAIToolDetails,
   fetchAIArticles,
+  getAllContentLikesByUserId,
+  handleLikeContent,
+  setShowLoginModel,
 } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+
 const ArticleDetail = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [openShareModel, setOpenShareModel] = useState(false);
+  const shareURL = window.location.href;
+  const commentSectionRef = useRef<HTMLDivElement>(null);
 
-  const { cDetails, aiCategories, aIArticles } = useAppSelector(
+  const { cDetails, aiCategories, aIArticles, user, userContentLikes } = useAppSelector(
     (state: any) => state.content
   );
   console.log("cDetails", cDetails);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
+    if (user?.id) {
+      dispatch(
+        getAllContentLikesByUserId({
+          user_id: user?.id,
+        })
+      );
+    }
   }, [id]);
 
   useEffect(() => {
@@ -50,10 +67,56 @@ const ArticleDetail = () => {
     }
   }, [cDetails?.id]);
 
+  const handlecontentLike = async (isLiked: boolean) => {
+    setLoading(true);
+    if (!user?.id) {
+      toast({
+        title: "Please login",
+        description: "You need to be logged in to like articles",
+        variant: "destructive",
+      });
+      dispatch(setShowLoginModel(true));
+      return;
+    }
+    await dispatch(
+      handleLikeContent({
+        type: "articles",
+        content_id: cDetails.id,
+        isLiked: !isLiked,
+        user_id: user?.id || 1,
+      })
+    );
+    await dispatch(
+      getAllContentLikesByUserId({
+        user_id: user?.id || 1,
+      })
+    );
+    setLoading(false);
+  };
+
+  const handleScrollToComments = () => {
+    commentSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const isLiked = userContentLikes?.find(
+    (like: any) => like?.content_id == cDetails?.id
+  );
+
   // Mock article data
 
   return (
     <Layout>
+      <ShareModal
+        show={openShareModel}
+        url={shareURL}
+        title="Share on"
+        handleClose={() => {
+          setOpenShareModel(false);
+        }}
+        onCopyClick={() => {
+          navigator.clipboard.writeText(shareURL);
+        }}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}
@@ -131,27 +194,34 @@ const ArticleDetail = () => {
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-4">
                   <Button
-                    disabled
                     variant="outline"
-                    className="hover:bg-primary hover:text-white transition-all duration-200"
+                    className={`hover:bg-primary hover:text-white transition-all duration-200 ${
+                      isLiked ? "bg-primary text-white" : ""
+                    }`}
+                    onClick={() => handlecontentLike(!!isLiked)}
+                    disabled={loading}
                   >
-                    <Heart className="mr-2 h-4 w-4" />
-                    Like
+                    <Heart
+                      className={`mr-2 h-4 w-4 ${
+                        isLiked ? "fill-white text-white" : ""
+                      }`}
+                    />
+                    {isLiked ? "Liked" : "Like"}
                     {/* ({cDetails.likes}) */}
                   </Button>
                   <Button
-                    disabled
                     variant="outline"
                     className="hover:bg-primary hover:text-white transition-all duration-200"
+                    onClick={handleScrollToComments}
                   >
                     <MessageCircle className="mr-2 h-4 w-4" />
                     Comments
                     {/* ({cDetails.comments}) */}
                   </Button>
                   <Button
-                    disabled
                     variant="outline"
                     className="hover:bg-primary hover:text-white transition-all duration-200"
+                    onClick={() => setOpenShareModel(true)}
                   >
                     <Share2 className="mr-2 h-4 w-4" />
                     Share
@@ -212,6 +282,10 @@ const ArticleDetail = () => {
                 </CardContent>
               </Card>
             )}
+            
+            <div ref={commentSectionRef} className="mt-8">
+              <CommentSection contentId={cDetails?.id || id} type="articles" />
+            </div>
           </div>
 
           {/* Right Sidebar */}
