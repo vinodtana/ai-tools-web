@@ -19,6 +19,7 @@ import {
 import Layout from "@/components/Layout";
 import RightSidebar from "@/components/RightSidebar";
 import SimilarItemCard from "@/components/SimilarItemCard";
+import CommentSection from "@/components/CommentSection";
 import {
   fetchAIToolDetails,
   fetchAIPromots,
@@ -240,7 +241,11 @@ const PromptDetail = () => {
                 </div>
               </CardContent>
             </Card>
-
+            <Card className="mb-8">
+              <CardContent className="p-6">
+                <CommentSection contentId={cDetails?.id || id} type="prompts" />
+              </CardContent>
+            </Card>
             {/* Instructions */}
             {cDetails?.instructions?.length > 0 && (
               <Card className="mb-8">

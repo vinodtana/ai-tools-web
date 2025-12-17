@@ -156,6 +156,67 @@ export const fetchAIToolDetails = createAsyncThunk(
   }
 );
 
+export const fetchComments = createAsyncThunk(
+  'aiContents/fetchComments',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    return await get(`${SERVER_IP}/contents/comments?${queryString}`);
+  }
+);
+
+export const addComment = createAsyncThunk(
+  'aiContents/addComment',
+  async (body: any) => {
+    // If there is media, upload it first
+    if (body.media instanceof File) {
+        try {
+            const fileName = `${Date.now()}-${body.media.name.replace(/\s+/g, '-')}`;
+            const fileType = body.media.type;
+            
+            // 1. Get Presigned URL
+            const presignedResponse = await post(`${SERVER_IP}/contents/get-presigned-url`, {
+                fileName,
+                fileType
+            });
+            
+            if (presignedResponse?.url) {
+                // 2. Upload to S3
+                // We use fetch directly here to avoid default headers from axios/helpers
+                const uploadResponse = await fetch(presignedResponse.url, {
+                    method: 'PUT',
+                    body: body.media,
+                    headers: {
+                        'Content-Type': fileType
+                    }
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Failed to upload media');
+                }
+                
+                // 3. Set media_url
+                // Assuming standard S3 URL format. Adjust if using CloudFront or different structure.
+                body.media_url = `https://topaitools-images.s3.ap-south-1.amazonaws.com/${fileName}`;
+                body.media_type = fileType;
+            }
+        } catch (error) {
+            console.error("Media upload failed:", error);
+            // Optionally throw or continue without media
+            // throw error; 
+        }
+        delete body.media;
+    }
+    return await post(`${SERVER_IP}/contents/comments`, body);
+  }
+);
+
+export const likeComment = createAsyncThunk(
+  'aiContents/likeComment',
+  async (body: any) => {
+    return await post(`${SERVER_IP}/contents/comments/like`, body);
+  }
+);
+
 const userData: string | null = localStorage.getItem("user");
 
 
@@ -182,6 +243,7 @@ const initialState: any = {
   articleCategories: [],
   newsCategories: [],
   userContentLikes: [],
+  comments: [],
 };
 
 
@@ -327,6 +389,27 @@ const aiContentsSlice = createSlice({
         state.loading = false;
         console.log("action.payload", action.payload);
         state.userContentLikes = action.payload.data?.items || [];
+      })
+      .addCase(fetchComments.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchComments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.comments = action.payload.data || [];
+      })
+      .addCase(fetchComments.rejected, (state, action) => {
+        state.loading = false;
+        console.error("fetchComments failed", action.error);
+      })
+      .addCase(addComment.fulfilled, (state, action) => {
+        // Optimistic update or re-fetch can be triggered in component
+        // But if backend returns the new comment, we can push it
+        if (action.payload.success && action.payload.data) {
+           // If it's a top level comment, push to list. If reply, we might need complex logic.
+           // For simplicity, we might just rely on re-fetching in the component, or basic push if simple.
+           // Let's rely on component re-fetching for now to ensure consistency, 
+           // but we can also append if we want instant feedback.
+        }
       })
       
       

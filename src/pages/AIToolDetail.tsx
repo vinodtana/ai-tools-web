@@ -21,7 +21,7 @@ import {
   Play,
   Image as ImageIcon,
   ArrowRight,
-  Heart
+  Heart,
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import RightSidebar from "@/components/RightSidebar";
@@ -37,6 +37,7 @@ import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { triggerMixpanelEvent } from "../Scenes/common";
+import CommentSection from "@/components/CommentSection";
 
 const AIToolDetail = () => {
   const { id } = useParams();
@@ -46,9 +47,8 @@ const AIToolDetail = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const { cDetails, aiCategories, aiTools, user, userContentLikes } = useAppSelector(
-    (state: any) => state.content
-  );
+  const { cDetails, aiCategories, aiTools, user, userContentLikes } =
+    useAppSelector((state: any) => state.content);
 
   console.log("cDetails", cDetails);
   console.log("user", user);
@@ -56,13 +56,13 @@ const AIToolDetail = () => {
     dispatch(fetchAIToolDetails(id));
     const jsonObj = { page: 1, limit: 50 };
     // dispatch(fetchAITools(jsonObj));
-     if(user?.id){
-          dispatch(
-          getAllContentLikesByUserId({
-            user_id: user?.id,
-          })
-        );
-        }
+    if (user?.id) {
+      dispatch(
+        getAllContentLikesByUserId({
+          user_id: user?.id,
+        })
+      );
+    }
   }, []);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
@@ -93,7 +93,9 @@ const AIToolDetail = () => {
         dispatch(createClickOut(clickOutData));
         window.open(tUrl, "_blank");
       } else if (cDetails?.name) {
-        const nnurl = `https://www.google.com/search?q=${encodeURIComponent(cDetails?.name)}`;
+        const nnurl = `https://www.google.com/search?q=${encodeURIComponent(
+          cDetails?.name
+        )}`;
         const clickOutData = {
           user_id: user?.id,
           content_id: cDetails?.id,
@@ -101,41 +103,38 @@ const AIToolDetail = () => {
           type: "tools",
         };
         dispatch(createClickOut(clickOutData));
-        window.open(
-         nnurl,
-          "_blank"
-        );
+        window.open(nnurl, "_blank");
       }
     } else {
       dispatch(setShowLoginModel(true));
     }
   };
   const handlecontentLike = async (isLiked: boolean) => {
-      setLoading(true);
-      if (!user?.id) {
-        toast({
-          title: "Please login",
-          description: "You need to be logged in to like tools",
-          variant: "destructive",
-        });
-        dispatch(setShowLoginModel(true));
-        return;
-      }
-      await dispatch(
-        handleLikeContent({
-          type: "tools",
-          content_id: cDetails.id,
-          isLiked: !isLiked,
-          user_id: user?.id || 1,
-        })
-      );
-      await dispatch(
-        getAllContentLikesByUserId({
-          user_id: user?.id || 1,
-        })
-      );
-      setLoading(false);
-    };
+    setLoading(true);
+    if (!user?.id) {
+      toast({
+        title: "Please login",
+        description: "You need to be logged in to like tools",
+        variant: "destructive",
+      });
+      dispatch(setShowLoginModel(true));
+      return;
+    }
+    await dispatch(
+      handleLikeContent({
+        type: "tools",
+        content_id: cDetails.id,
+        isLiked: !isLiked,
+        user_id: user?.id || 1,
+      })
+    );
+    await dispatch(
+      getAllContentLikesByUserId({
+        user_id: user?.id || 1,
+      })
+    );
+    setLoading(false);
+  };
 
   const allIMages =
     cDetails?.images?.length === 0
@@ -147,7 +146,7 @@ const AIToolDetail = () => {
         ]
       : cDetails?.images;
 
-      const isLiked = userContentLikes?.find(
+  const isLiked = userContentLikes?.find(
     (like: any) => like?.content_id == cDetails?.id
   );
   return (
@@ -653,6 +652,9 @@ const AIToolDetail = () => {
                 </Tabs>
               </CardContent>
             </Card>
+            <div className="mt-12">
+              <CommentSection contentId={cDetails?.id || id} type="tools" />
+            </div>
           </div>
 
           {/* Right Sidebar */}
@@ -661,7 +663,6 @@ const AIToolDetail = () => {
           </div>
         </div>
 
-        
         <div className="mt-12">
           <Card className="hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-500">
             <CardHeader>
@@ -673,17 +674,13 @@ const AIToolDetail = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 similar-tools-section-content">
                 {aiTools?.map((similarTool, index) => (
-                   <ToolCard
-                tool={similarTool}
-                index={index}
-              />
+                  <ToolCard tool={similarTool} index={index} />
 
-                  
                   //   <Card
                   //   key={similarTool.id}
                   //   className="group hover:border-primary hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden"
                   // >
-              
+
                   //   <div className="relative h-32-test flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
                   //     <div className="text-4xl group-hover:scale-110-111 transition-transform-111 duration-300-111">
                   //       {" "}
@@ -723,7 +720,6 @@ const AIToolDetail = () => {
                   //       </p>
                   //     </div>
 
-                  
                   //     {similarTool.planType &&
                   //       similarTool.planType !== "nan" && (
                   //         <div className="flex justify-center mb-4">
@@ -736,7 +732,6 @@ const AIToolDetail = () => {
                   //         </div>
                   //       )}
 
-                     
                   //     <div className="flex flex-wrap gap-2 mb-6">
                   //       {similarTool?.categoryNamesList?.map(
                   //         (category, index) => (
@@ -763,8 +758,6 @@ const AIToolDetail = () => {
                   //     </Link>
                   //   </CardContent>
                   // </Card>
-
-
                 ))}
               </div>
 
