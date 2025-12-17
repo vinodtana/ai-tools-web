@@ -38,6 +38,7 @@ const App = () => (
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<AITools />} />
           
           {/* AI Tools Routes */}
           <Route path="/ai-tools" element={<AITools />} />

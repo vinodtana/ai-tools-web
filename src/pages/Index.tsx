@@ -31,7 +31,7 @@ import categoriesSection from '@/assets/categories-section.jpg';
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAITools, getAllContentLikesByUserId } from "../store/features/contents/contentsSlice";
+import { fetchAITools,fetchAITopTools, getAllContentLikesByUserId } from "../store/features/contents/contentsSlice";
 import { useState, useEffect } from "react";
 
 
@@ -44,7 +44,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPricing, setSelectedPricing] = useState("all");
 
-  const { aiTools, isLoading, pagination, aiCategories , user} = useAppSelector(
+  const { aiTools, isLoading, pagination, aiCategories , user, topAITools} = useAppSelector(
     (state: any) => state.content
   );
   console.log("aiTools", aiTools);
@@ -54,6 +54,7 @@ const Index = () => {
     // page, limit, search, type, status, isActive, categoryIds
     const jsonObj = { page: 1, limit: 6 };
     dispatch(fetchAITools(jsonObj));
+    dispatch(fetchAITopTools({ page: 1, limit: 9 }));
      if(user?.id){
           dispatch(
           getAllContentLikesByUserId({
@@ -267,6 +268,41 @@ const Index = () => {
       </section>
 
       {/* Featured Tools Section */}
+
+       <section className="py-16 bg-gradient-to-br from-primary-light to-white relative">
+        {/* Floating decoration elements */}
+        <div className="absolute top-10 right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-float"></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl animate-float" style={{ animationDelay: '3s' }}></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-12 animate-slide-up">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">TOP AI Tools</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+              Most popular and highly-rated AI tools used by millions worldwide
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {topAITools?.map((tool, index) => (
+                              <ToolCard
+                tool={tool}
+                index={index}
+              />
+            ))}
+          </div>
+          
+          <div className="text-center mt-12 animate-scale-bounce" style={{ animationDelay: '0.8s' }}>
+            <Link to="/ai-tools">
+              <Button size="lg" variant="outline" className="group bg-white/60 backdrop-blur-sm border-primary/30 hover:bg-white/80 hover:scale-105 transition-all hover:border-primary/50">
+                View All Tools
+                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
       <section className="py-16 bg-gradient-to-br from-primary-light to-white relative">
         {/* Floating decoration elements */}
         <div className="absolute top-10 right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-float"></div>

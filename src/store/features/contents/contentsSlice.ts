@@ -96,6 +96,15 @@ export const fetchAITools= createAsyncThunk(
     return response.json();
   }
 );
+export const fetchAITopTools= createAsyncThunk(
+  'aiContents/fetchAITopTools',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    console.log("params", params);
+    const response = await fetch(`${SERVER_IP}/contents?display_order=10&type=tools&${queryString}`);
+    return response.json();
+  }
+);
 export const fetchAIPromots= createAsyncThunk(
   'aiContents/fetchAIPromots',
   async (params: any) => {
@@ -244,6 +253,7 @@ const initialState: any = {
   newsCategories: [],
   userContentLikes: [],
   comments: [],
+  topAITools: [],
 };
 
 
@@ -389,6 +399,10 @@ const aiContentsSlice = createSlice({
         state.loading = false;
         console.log("action.payload", action.payload);
         state.userContentLikes = action.payload.data?.items || [];
+      })
+      .addCase(fetchAITopTools.fulfilled, (state, action) => {
+        state.loading = false;
+        state.topAITools = action.payload.data || [];
       })
       .addCase(fetchComments.pending, (state) => {
         state.loading = true;
