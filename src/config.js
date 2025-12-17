@@ -16,6 +16,8 @@ if (typeof window !== "undefined") {
     // SERVER_IP_URL = "https://liveapi.topaitools.ai/api";
   } else {
     SERVER_IP_URL = "https://liveapi.topaitools.ai/api";
+    SERVER_IP_URL = "http://localhost:3000/api";
+
   }
 }
 const MIXPANEL_ID1 = "ef8786e1b4be644396cef0543f380841";

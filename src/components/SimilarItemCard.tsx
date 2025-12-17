@@ -1,11 +1,56 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Star, Users, Calendar, Clock, Eye, User, ArrowRight, BookOpen } from 'lucide-react';
+import { Star, Users, Calendar, Clock, Eye, User, ArrowRight, BookOpen, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useAppDispatch, useAppSelector } from "./../store/hooks";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  handleLikeContent,
+  getAllContentLikesByUserId,
+  setShowLoginModel,
+} from "../store/features/contents/contentsSlice";
 
 const SimilarItemCard = ({ item, linkTo, type }: any) => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { user, userContentLikes } = useAppSelector((state: any) => state.content);
+
+  const handlecontentLike = async (isLiked: boolean) => {
+    setLoading(true);
+    if (!user?.id) {
+      toast({
+        title: "Please login",
+        description: "You need to be logged in to like tools",
+        variant: "destructive",
+      });
+      dispatch(setShowLoginModel(true));
+      return;
+    }
+    await dispatch(
+      handleLikeContent({
+        type: "prompts",
+        content_id: item.id,
+        isLiked: !isLiked,
+        user_id: user?.id || 1,
+      })
+    );
+    await dispatch(
+      getAllContentLikesByUserId({
+        user_id: user?.id || 1,
+      })
+    );
+    setLoading(false);
+  };
+
+  const isLiked = userContentLikes?.find(
+    (like: any) => like?.content_id == item?.id
+  );
+
   // Get default image based on type
   const getDefaultImage = () => {
     const gradients = {
@@ -42,13 +87,22 @@ const SimilarItemCard = ({ item, linkTo, type }: any) => {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
-        <div className="absolute top-4 right-4">
-          {item.rating && (
-            <Badge className="primary-gradient text-white shadow-lg">
-              <Star className="h-3 w-3 mr-1" />
-              {item.rating}
-            </Badge>
-          )}
+        <div className="absolute top-4 right-4 z-10"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handlecontentLike(isLiked);
+          }}
+        >
+          <div className={`p-2 rounded-full transition-all duration-300 cursor-pointer ${
+            isLiked
+              ? "bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-indigo-500/30"
+              : "bg-white/10 backdrop-blur-md hover:bg-white/20"
+          }`}>
+            <Heart className={`h-4 w-4 transition-all duration-300 ${
+              isLiked ? "fill-white text-white scale-110" : "text-white"
+            }`} />
+          </div>
         </div>
       </div>
       

@@ -1,0 +1,37 @@
+.conformation-model {
+  padding: 30px;
+}
+.conformation-model p {
+  font-size: 25px;
+}
+.conformation-model-box .modal-dialog {
+  max-width: 500px;
+}
+.conformation-model .cancel-btn {
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  padding: 9px 5px;
+  /* margin: 5px; */
+  width: 100px;
+  display: inline-block;
+  text-align: center;
+  /* color: #007bff; */
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 10px;
+  background: #fff;
+  margin-right: 20px;
+}
+.conformation-model .delete-btn {
+  text-transform: capitalize;
+  background: steelblue;
+  line-height: 35px;
+  border-radius: 5px;
+  min-width: 100px;
+  text-align: center;
+  color: #fff;
+  border: none;
+  padding: 0px 40px;
+  height: 40px;
+  font-size: 20px;
+  /* margin-top: -2px; */
+}

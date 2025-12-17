@@ -23,6 +23,7 @@ import {
   fetchAIToolDetails,
   fetchAIPromots,
   fetchPromptCategories,
+  getAllContentLikesByUserId,
 } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
@@ -35,7 +36,7 @@ const PromptDetail = () => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
 
-  const { cDetails, aiCategories, aIPromots, promptCategories } =
+  const { cDetails, aiCategories, aIPromots, promptCategories, user } =
     useAppSelector((state: any) => state.content);
   console.log("cDetails", cDetails);
   useEffect(() => {
@@ -46,6 +47,13 @@ const PromptDetail = () => {
     dispatch(fetchAIToolDetails(id));
     // const jsonObj = { page: 1, limit: 50 };
     //  dispatch(fetchAIPromots(jsonObj));
+     if(user?.id){
+              dispatch(
+              getAllContentLikesByUserId({
+                user_id: user?.id,
+              })
+            );
+            }
   }, [id]);
   useEffect(() => {
     if (cDetails?.categoryNamesList?.length > 0) {

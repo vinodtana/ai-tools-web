@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ToolCard from "@/components/ToolCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Star,
@@ -20,6 +21,7 @@ import {
   Play,
   Image as ImageIcon,
   ArrowRight,
+  Heart
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import RightSidebar from "@/components/RightSidebar";
@@ -28,6 +30,8 @@ import {
   fetchAITools,
   setShowLoginModel,
   createClickOut,
+  getAllContentLikesByUserId,
+  handleLikeContent,
 } from "../store/features/contents/contentsSlice";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
@@ -40,8 +44,9 @@ const AIToolDetail = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
 
-  const { cDetails, aiCategories, aiTools, user } = useAppSelector(
+  const { cDetails, aiCategories, aiTools, user, userContentLikes } = useAppSelector(
     (state: any) => state.content
   );
 
@@ -51,6 +56,13 @@ const AIToolDetail = () => {
     dispatch(fetchAIToolDetails(id));
     const jsonObj = { page: 1, limit: 50 };
     // dispatch(fetchAITools(jsonObj));
+     if(user?.id){
+          dispatch(
+          getAllContentLikesByUserId({
+            user_id: user?.id,
+          })
+        );
+        }
   }, []);
   useEffect(() => {
     dispatch(fetchAIToolDetails(id));
@@ -98,6 +110,33 @@ const AIToolDetail = () => {
       dispatch(setShowLoginModel(true));
     }
   };
+  const handlecontentLike = async (isLiked: boolean) => {
+      setLoading(true);
+      if (!user?.id) {
+        toast({
+          title: "Please login",
+          description: "You need to be logged in to like tools",
+          variant: "destructive",
+        });
+        dispatch(setShowLoginModel(true));
+        return;
+      }
+      await dispatch(
+        handleLikeContent({
+          type: "tools",
+          content_id: cDetails.id,
+          isLiked: !isLiked,
+          user_id: user?.id || 1,
+        })
+      );
+      await dispatch(
+        getAllContentLikesByUserId({
+          user_id: user?.id || 1,
+        })
+      );
+      setLoading(false);
+    };
+
   const allIMages =
     cDetails?.images?.length === 0
       ? [
@@ -107,6 +146,10 @@ const AIToolDetail = () => {
             cDetails?.logoTemp,
         ]
       : cDetails?.images;
+
+      const isLiked = userContentLikes?.find(
+    (like: any) => like?.content_id == cDetails?.id
+  );
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -199,11 +242,35 @@ const AIToolDetail = () => {
                   </div>
 
                   {/* Sidebar Info */}
-                  <Card className="w-full lg:w-80 bg-muted/30 hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-500">
-                    <CardHeader>
+                  <Card className="w-full lg:w-80 bg-muted/30 hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-500 relative">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-lg">
                         Tool Information
                       </CardTitle>
+                      <div
+                        className=""
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handlecontentLike(isLiked);
+                        }}
+                      >
+                        <div
+                          className={`p-2 rounded-full transition-all duration-300 cursor-pointer ${
+                            isLiked
+                              ? "bg-gradient-to-r from-violet-600 to-indigo-600 shadow-lg shadow-indigo-500/30"
+                              : "bg-gray-200/50 backdrop-blur-md hover:bg-gray-300/50"
+                          }`}
+                        >
+                          <Heart
+                            className={`h-4 w-4 transition-all duration-300 ${
+                              isLiked
+                                ? "fill-white text-white scale-110"
+                                : "text-gray-600"
+                            }`}
+                          />
+                        </div>
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {cDetails.companyName && (
@@ -594,7 +661,7 @@ const AIToolDetail = () => {
           </div>
         </div>
 
-        {/* Similar Tools Section */}
+        
         <div className="mt-12">
           <Card className="hover:border-primary hover:shadow-2xl hover:scale-105-111 transition-all duration-500">
             <CardHeader>
@@ -606,97 +673,98 @@ const AIToolDetail = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 similar-tools-section-content">
                 {aiTools?.map((similarTool, index) => (
-                  <Card
-                    key={similarTool.id}
-                    className="group hover:border-primary hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden"
-                  >
-                    {/* Tool Logo/Icon */}
-                    <div className="relative h-32-test flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
-                      <div className="text-4xl group-hover:scale-110-111 transition-transform-111 duration-300-111">
-                        {" "}
-                        <img
-                          src={
-                            similarTool.bannerImage ||
-                            similarTool?.bannerImageTemp ||
-                            similarTool?.logoTemp
-                          }
-                        />{" "}
-                      </div>
-                      <div className="absolute top-4 right-4">
-                        <Badge className="primary-gradient text-white shadow-lg">
-                          <Star className="h-3 w-3 mr-1" />
-                          {similarTool.rating}
-                        </Badge>
-                      </div>
-                    </div>
+                   <ToolCard
+                tool={similarTool}
+                index={index}
+              />
 
-                    <CardContent className="p-6">
-                      <div className="mb-4">
-                        <Link
-                          to={`/ai-tools/${similarTool?.name?.replace(
-                            /\s+/g,
-                            "-"
-                          )}/${similarTool.id}`}
-                        >
-                          <h4 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
-                            {similarTool.name}
-                          </h4>
-                        </Link>
-                        <p className="text-muted-foreground text-sm font-medium mb-3">
-                          {similarTool.company}
-                        </p>
-                        <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
-                          {similarTool.tagline}
-                        </p>
-                      </div>
+                  
+                  //   <Card
+                  //   key={similarTool.id}
+                  //   className="group hover:border-primary hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden"
+                  // >
+              
+                  //   <div className="relative h-32-test flex items-center justify-center bg-gradient-to-br from-primary/5 to-muted/20">
+                  //     <div className="text-4xl group-hover:scale-110-111 transition-transform-111 duration-300-111">
+                  //       {" "}
+                  //       <img
+                  //         src={
+                  //           similarTool.bannerImage ||
+                  //           similarTool?.bannerImageTemp ||
+                  //           similarTool?.logoTemp
+                  //         }
+                  //       />{" "}
+                  //     </div>
+                  //     <div className="absolute top-4 right-4">
+                  //       <Badge className="primary-gradient text-white shadow-lg">
+                  //         <Star className="h-3 w-3 mr-1" />
+                  //         {similarTool.rating}
+                  //       </Badge>
+                  //     </div>
+                  //   </div>
 
-                      {/* Plan Type Badge */}
-                      {similarTool.planType &&
-                        similarTool.planType !== "nan" && (
-                          <div className="flex justify-center mb-4">
-                            <Badge
-                              variant="secondary"
-                              className="bg-primary/5 text-primary border-primary/20 text-xs"
-                            >
-                              {similarTool.planType}
-                            </Badge>
-                          </div>
-                        )}
+                  //   <CardContent className="p-6">
+                  //     <div className="mb-4">
+                  //       <Link
+                  //         to={`/ai-tools/${similarTool?.name?.replace(
+                  //           /\s+/g,
+                  //           "-"
+                  //         )}/${similarTool.id}`}
+                  //       >
+                  //         <h4 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+                  //           {similarTool.name}
+                  //         </h4>
+                  //       </Link>
+                  //       <p className="text-muted-foreground text-sm font-medium mb-3">
+                  //         {similarTool.company}
+                  //       </p>
+                  //       <p className="text-muted-foreground text-xs leading-relaxed line-clamp-2">
+                  //         {similarTool.tagline}
+                  //       </p>
+                  //     </div>
 
-                      {/* <div className="flex items-center justify-center pt-4 border-t border-primary/10 mb-4">
-                        <div className="text-center">
-                          <span className="font-medium text-primary text-sm">
-                            {similarTool.price}
-                          </span>
-                        </div>
-                      </div> */}
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {similarTool?.categoryNamesList?.map(
-                          (category, index) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="bg-primary/5 text-primary text-transform-capitalize border-primary/20"
-                            >
-                              {category}
-                            </Badge>
-                          )
-                        )}
-                      </div>
-                      {/* View Details Button */}
-                      <Link
-                        to={`/ai-tools/${similarTool?.name?.replace(
-                          /\s+/g,
-                          "-"
-                        )}/${similarTool.id}`}
-                      >
-                        <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
-                          View Details
-                          <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                  
+                  //     {similarTool.planType &&
+                  //       similarTool.planType !== "nan" && (
+                  //         <div className="flex justify-center mb-4">
+                  //           <Badge
+                  //             variant="secondary"
+                  //             className="bg-primary/5 text-primary border-primary/20 text-xs"
+                  //           >
+                  //             {similarTool.planType}
+                  //           </Badge>
+                  //         </div>
+                  //       )}
+
+                     
+                  //     <div className="flex flex-wrap gap-2 mb-6">
+                  //       {similarTool?.categoryNamesList?.map(
+                  //         (category, index) => (
+                  //           <Badge
+                  //             key={index}
+                  //             variant="secondary"
+                  //             className="bg-primary/5 text-primary text-transform-capitalize border-primary/20"
+                  //           >
+                  //             {category}
+                  //           </Badge>
+                  //         )
+                  //       )}
+                  //     </div>
+                  //     <Link
+                  //       to={`/ai-tools/${similarTool?.name?.replace(
+                  //         /\s+/g,
+                  //         "-"
+                  //       )}/${similarTool.id}`}
+                  //     >
+                  //       <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
+                  //         View Details
+                  //         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  //       </Button>
+                  //     </Link>
+                  //   </CardContent>
+                  // </Card>
+
+
                 ))}
               </div>
 

@@ -22,6 +22,22 @@ export const createClickOut = createAsyncThunk('tools/createClickOut', async (bo
 });
 
 
+export const handleLikeContent = createAsyncThunk(
+  'tools/handleLikeContent',
+  async (body: any) => {
+    return await post(`${SERVER_IP}/contents/likes`, body);
+  }
+);
+export const getAllContentLikesByUserId = createAsyncThunk(
+  'tools/getAllContentLikesByUserId',
+  async (params: any) => {
+    const queryString = toQueryParams(params);
+    return await get(`${SERVER_IP}/contents/likes/${params?.user_id}?${queryString}`);
+  }
+);
+
+
+
 export const handlePrifileSave = createAsyncThunk('tools/handlePrifileSave', async (body: any) => {
   return await put(`${SERVER_IP}/users/${body?.id}`, body.user);
 });
@@ -165,6 +181,7 @@ const initialState: any = {
   promptCategories: [],
   articleCategories: [],
   newsCategories: [],
+  userContentLikes: [],
 };
 
 
@@ -306,6 +323,12 @@ const aiContentsSlice = createSlice({
         state.loading = false;
         state.cDetails = action.payload.data || {};
       })
+      .addCase(getAllContentLikesByUserId.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("action.payload", action.payload);
+        state.userContentLikes = action.payload.data?.items || [];
+      })
+      
       
       
   },

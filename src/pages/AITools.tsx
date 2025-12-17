@@ -14,6 +14,7 @@ import {
   ChevronRight,
   ToggleLeft,
   ToggleRight,
+  Heart,
 } from "lucide-react";
 
 import {
@@ -38,8 +39,12 @@ import { useToast } from "@/hooks/use-toast";
 import {
   fetchAITools,
   fetchToolCategories,
+  handleLikeContent,
+  getAllContentLikesByUserId,
 } from "../store/features/contents/contentsSlice";
 import { ITEMS_LIMIT } from "../config";
+import Loader from "@/components/Common/Loader";
+import ToolCard from "@/components/ToolCard";
 
 const AITools = () => {
   const { category_name } = useParams();
@@ -51,7 +56,7 @@ const AITools = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedPricing, setSelectedPricing] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-
+  const [loading, setLoading] = useState(false);
   const {
     aiTools,
     isLoading,
@@ -59,12 +64,16 @@ const AITools = () => {
     aiCategories,
     toolCategories,
     promptCategories,
+    user,
+    userContentLikes,
   } = useAppSelector((state: any) => state.content);
+  // const { user } = useAppSelector((state: any) => state.auth);
   console.log("aiTools", aiTools);
   console.log("aiToolsPagination", aiToolsPagination);
   console.log("toolCategories", toolCategories);
   console.log("selectedCategory", selectedCategory);
   console.log("category_name", category_name);
+  console.log("userContentLikes", userContentLikes);
 
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
@@ -78,6 +87,14 @@ const AITools = () => {
         type: "tools",
       })
     );
+    if(user?.id){
+      dispatch(
+      getAllContentLikesByUserId({
+        user_id: user?.id,
+      })
+    );
+    }
+    
   }, []);
 
   useEffect(() => {
@@ -98,6 +115,7 @@ const AITools = () => {
     };
     dispatch(fetchAITools(jsonObj));
   };
+ 
   const handleChangeStatus = (e: any) => {
     setCurrentPage(e);
     // setStatus(e.value);
@@ -105,10 +123,11 @@ const AITools = () => {
   // Mock data - in real app this would come from API
 
   const pricingOptions = ["all", "Free", "Freemium", "Paid"];
-
+  console.log("aiToolsaiTools", aiTools);
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
+        {loading && <Loader />}
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -194,124 +213,16 @@ const AITools = () => {
 
         {/* Tools Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {aiTools?.map((tool, index) => (
-            <Link
-              target="_blank"
-              to={`/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${tool.id}`}
-            >
-              <Card
-                key={tool.id}
-                className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all-111 duration-500-111 animate-slide-up-111 overflow-hidden-111 hover:scale-105-111"
-                style={{ animationDelay: `${index * 0.15}s` }}
-              >
-                {/* Tool Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                    <div className="text-6xl">
-                      <img
-                        src={
-                          tool.bannerImage ||
-                          tool?.bannerImageTemp ||
-                          tool?.logoTemp
-                        }
-                        alt={tool?.name}
-                        onClick={() => {
-                          window.open(
-                            `/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${
-                              tool.id
-                            }`,
-                            "_blank"
-                          );
-                        }}
-                      />
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
-                  <div className="absolute top-4 right-4">
-                    <Badge className="primary-gradient text-white shadow-lg">
-                      <Star className="h-3 w-3 mr-1" />
-                      {tool.rating}
-                    </Badge>
-                  </div>
-                </div>
-
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <a
-                      target="_blank"
-                      href={`/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${
-                        tool.id
-                      }`}
-                      className="no-underline"
-                    >
-                      <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                        {tool.name}
-                      </h3>
-                    </a>
-                    <p className="text-muted-foreground text-sm font-medium mb-3">
-                      {tool.tagline}
-                    </p>
-                    {tool?.companyName && (
-                      <p className="text-muted-foreground text-sm font-medium mb-3">
-                        {tool.companyName}
-                      </p>
-                    )}
-
-                    <p className="text-muted-foreground text-xs leading-relaxed">
-                      {/* {tool.overview} */}
-                      <p
-                        className="truncate-3-lines"
-                        dangerouslySetInnerHTML={{
-                          __html: tool.overview,
-                        }}
-                      ></p>
-                    </p>
-                  </div>
-
-                  {/* Categories */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {tool.categoryNamesList
-                      ?.slice(0, 2)
-                      .map((category, catIndex) => (
-                        <Badge
-                          key={catIndex}
-                          variant="secondary"
-                          className="bg-primary/5 text-primary border-primary/20 text-xs"
-                        >
-                          {category}
-                        </Badge>
-                      ))}
-                    {tool.categoryNamesList.length > 2 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{tool.categoryNamesList?.length - 2}
-                      </Badge>
-                    )}
-                  </div>
-                  {tool?.planType && (
-                    <p className="text-muted-foreground text-sm font-medium mb-3">
-                      {tool.planType}
-                    </p>
-                  )}
-                  {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <span>{tool.users} users</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge className="primary-gradient text-white text-xs">
-                      {tool.price}
-                    </Badge>
-                  </div>
-                </div> */}
-
-                  {/* View Details Button */}
-                  <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
-                    View Details
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+          {aiTools?.map((tool, index) => {
+            console.log("tool parent", tool);
+            return (
+              <ToolCard
+                tool={tool}
+                index={index}
+              />
+          )
+          }
+          )}
         </div>
 
         <div className="ai-summary-pagination max-w-6xl mx-auto">

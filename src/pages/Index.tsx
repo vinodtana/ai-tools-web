@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import ToolCard from '@/components/ToolCard';
 import { 
   Bot, 
   Zap, 
@@ -30,7 +31,7 @@ import categoriesSection from '@/assets/categories-section.jpg';
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { fetchAITools } from "../store/features/contents/contentsSlice";
+import { fetchAITools, getAllContentLikesByUserId } from "../store/features/contents/contentsSlice";
 import { useState, useEffect } from "react";
 
 
@@ -43,7 +44,7 @@ const Index = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPricing, setSelectedPricing] = useState("all");
 
-  const { aiTools, isLoading, pagination, aiCategories } = useAppSelector(
+  const { aiTools, isLoading, pagination, aiCategories , user} = useAppSelector(
     (state: any) => state.content
   );
   console.log("aiTools", aiTools);
@@ -53,6 +54,13 @@ const Index = () => {
     // page, limit, search, type, status, isActive, categoryIds
     const jsonObj = { page: 1, limit: 6 };
     dispatch(fetchAITools(jsonObj));
+     if(user?.id){
+          dispatch(
+          getAllContentLikesByUserId({
+            user_id: user?.id,
+          })
+        );
+        }
   }, []);
 
  
@@ -274,83 +282,10 @@ const Index = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {aiTools?.map((tool, index) => (
-                              <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
-
-              <Card key={tool.id} className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all duration-500 animate-slide-up overflow-hidden hover:scale-105-111" style={{ animationDelay: `${index * 0.15}s` }}>
-                {/* Tool Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp} 
-                    alt={tool.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
-                  {tool.rating && tool.rating!=="0.0" && ( 
-                  <div className="absolute top-4 right-4">
-                    <Badge className="primary-gradient text-white shadow-lg">
-                      <Star className="h-3 w-3 mr-1" />
-                      {tool.rating}
-                    </Badge>
-                  </div>
-                  )}
-                </div>
-                
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                <Link target="_blank" to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
-                    <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">{tool.name}</h3>
-                    <p className="text-muted-foreground text-sm font-medium mb-3">{tool.tagline}</p>
-                  </Link>
-                    <p className="text-muted-foreground text-xs leading-relaxed">
-                    <p className='truncate-3-lines'
-                                  dangerouslySetInnerHTML={{
-                                    __html: tool.overview,
-                                  }}
-                                ></p>
-
-                    </p>
-                  </div>
-                  
-                  {/* Categories */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {tool?.category_names?.slice(0, 2).map((category, catIndex) => (
-                      <Badge key={catIndex} variant="secondary" className="bg-primary/5 text-primary border-primary/20 text-xs">
-                        {category}
-                      </Badge>
-                    ))}
-                    {tool?.categories?.length > 2 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{tool.categories.length - 2}
-                      </Badge>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
-                  {tool?.usersCount > 0 && (
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <span>{tool.usersCount} users</span>
-                    </div>
-                    )}
-                    <div className="flex flex-wrap gap-1">
-                      {tool?.prices?.map((price, priceIndex) => (
-                        <Badge key={priceIndex} className="primary-gradient text-white text-xs">
-                          {price}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* View Details Button */}
-                  <Link to={`/ai-tools/${tool.name?.replace(/\s+/g, '-')}/${tool.id}`}>
-                    <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
-                      View Details
-                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-               </Link>
+                              <ToolCard
+                tool={tool}
+                index={index}
+              />
             ))}
           </div>
           
