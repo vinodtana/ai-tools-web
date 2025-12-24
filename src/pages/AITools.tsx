@@ -87,35 +87,45 @@ const AITools = () => {
         type: "tools",
       })
     );
-    if(user?.id){
+    if (user?.id) {
       dispatch(
-      getAllContentLikesByUserId({
-        user_id: user?.id,
-      })
-    );
+        getAllContentLikesByUserId({
+          user_id: user?.id,
+        })
+      );
     }
-    
   }, []);
 
   useEffect(() => {
+    setSearchQuery("");
+    getAllAIToolsList("");
+  }, [ selectedCategory]);
+   useEffect(() => {
     getAllAIToolsList();
-  }, [searchQuery, currentPage, selectedCategory]);
+  }, [currentPage]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getAllAIToolsList();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   useEffect(() => {
     if (category_name) {
-      setSelectedCategory(category_name?.replace(/-/g, ' '));
+      setSelectedCategory(category_name?.replace(/-/g, " "));
     }
     getAllAIToolsList();
   }, [category_name]);
-  const getAllAIToolsList = () => {
+  const getAllAIToolsList = (searchvv?: string) => {
     const jsonObj = {
       page: currentPage,
       limit: ITEMS_LIMIT,
-      search: searchQuery,
+      search:  searchvv || searchQuery || "",
       category_name: selectedCategory,
     };
     dispatch(fetchAITools(jsonObj));
   };
- 
+
   const handleChangeStatus = (e: any) => {
     setCurrentPage(e);
     // setStatus(e.value);
@@ -124,45 +134,58 @@ const AITools = () => {
 
   const pricingOptions = ["all", "Free", "Freemium", "Paid"];
   console.log("aiToolsaiTools", aiTools);
+
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const categoriesToShow = showAllCategories
+    ? toolCategories.filter((c: any) => c?.tool_count > 50)
+    : toolCategories.filter((c: any) => c?.tool_count > 50).slice(0, 5);
+
+  const totalCategories = toolCategories.filter(
+    (c: any) => c?.tool_count > 50
+  ).length;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
         {loading && <Loader />}
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="text-center mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2 inline-flex items-center gap-2">
             <span className="primary-gradient bg-clip-text text-transparent">
               AI Tools
             </span>
+            <span className="text-lg md:text-xl text-muted-foreground font-normal">
+              - Discover the best AI tools for every use case.
+            </span>
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Discover the best AI tools for every use case. From conversational
-            AI to image generation, find the perfect tool to boost your
-            productivity.
-          </p>
         </div>
         <div className="md:text-3xl max-w-6xl mx-auto">
           <h3 className="font-bold mb-4 text-center">Top Categories</h3>
 
           <div className="text-center">
-            {toolCategories.map((category: any) => (
-              <>
-                {category?.tool_count > 50 && (
-                  <Button
-                    onClick={() => setSelectedCategory(category?.category_name)}
-                    variant={
-                      selectedCategory === category?.category_name
-                        ? "default"
-                        : "outline"
-                    }
-                    className="m-2 text-transform-capitalize"
-                    key={category?.category_name}
-                  >
-                    {category?.category_name} ({category?.tool_count})
-                  </Button>
-                )}
-              </>
+            {categoriesToShow.map((category: any) => (
+              <Button
+                onClick={() => setSelectedCategory(category?.category_name)}
+                variant={
+                  selectedCategory === category?.category_name
+                    ? "default"
+                    : "outline"
+                }
+                className="m-2 text-transform-capitalize"
+                key={category?.category_name}
+              >
+                {category?.category_name} ({category?.tool_count})
+              </Button>
             ))}
+            {totalCategories > 5 && (
+              <Button
+                onClick={() => setShowAllCategories(!showAllCategories)}
+                variant="ghost"
+                className="m-2 text-primary hover:text-primary/80"
+              >
+                {showAllCategories ? "Show Less" : "View All Categories"}
+              </Button>
+            )}
           </div>
         </div>
         {/* Filters */}
@@ -173,12 +196,12 @@ const AITools = () => {
               placeholder="Search AI tools..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 h-12"
             />
           </div>
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 h-12">
               <Filter className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Category" />
             </SelectTrigger>
@@ -191,7 +214,7 @@ const AITools = () => {
                   {/* {selectedCategory === "all"
                     ? "All Categories"
                     : category?.name} */}
-                  {category?.category_name} ({category?.tool_count})
+                 <span className="text-sm text-muted-foreground text-transform-capitalize ">{category?.category_name} ({category?.tool_count})</span>
                 </SelectItem>
               ))}
             </SelectContent>
@@ -215,14 +238,8 @@ const AITools = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {aiTools?.map((tool, index) => {
             console.log("tool parent", tool);
-            return (
-              <ToolCard
-                tool={tool}
-                index={index}
-              />
-          )
-          }
-          )}
+            return <ToolCard tool={tool} index={index} />;
+          })}
         </div>
 
         <div className="ai-summary-pagination max-w-6xl mx-auto">
@@ -238,7 +255,7 @@ const AITools = () => {
               showSizeChanger={false}
               // size="small"
             /> */}
-          {aiToolsPagination && (
+          {aiToolsPagination && aiToolsPagination?.total > 0 && (
             <div className="flex items-center justify-between ai-pagination-content mt-4">
               <p className="text-sm text-muted-foreground">
                 Showing{" "}

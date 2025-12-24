@@ -69,45 +69,57 @@ const ToolCard = (props: any) => {
     setLoading(false);
   };
 
+  const handleContentClick = (tool: any) => {
+    if (tool?.id) {
+      window.open(
+        `/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${tool.id}`,
+        "_blank"
+      );
+    } else if (tool?.website_url) {
+      if (user?.id) {
+        if (tool.website_url.startsWith("http")) {
+          window.open(tool.website_url, "_blank");
+        } else {
+          window.open(`https://${tool.website_url}`, "_blank");
+        }
+      } else {
+        dispatch(setShowLoginModel(true));
+      }
+    }
+  };
   const isLiked = userContentLikes?.find(
     (like: any) => like?.content_id == tool?.id
   );
   return (
-    <>
-      <Link
-        target="_blank"
-        to={`/ai-tools/${tool?.name?.replace(/\s+/g, "-")}/${tool.id}`}
+    <div
+      onClick={() => handleContentClick(tool)}
+      className="cursor-pointer block h-full"
+    >
+      <Card
+        key={tool.id}
+        className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all-111 duration-500-111 animate-slide-up-111 overflow-hidden-111 hover:scale-105-111"
+        style={{ animationDelay: `${index * 0.15}s` }}
       >
-        <Card
-          key={tool.id}
-          className="group hover:bg-transparent hover:border-primary-111 hover:shadow-2xl-111 transition-all-111 duration-500-111 animate-slide-up-111 overflow-hidden-111 hover:scale-105-111"
-          style={{ animationDelay: `${index * 0.15}s` }}
-        >
-          {/* Tool Image */}
-          <div className="relative h-48 overflow-hidden">
-            <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-              <div className="text-6xl">
-                <img
-                  src={
-                    tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp
-                  }
-                  alt={tool?.name}
-                  onClick={() => {
-                    window.open(
-                      `/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${tool.id}`,
-                      "_blank"
-                    );
-                  }}
-                />
-              </div>
+        {/* Tool Image */}
+        <div className="relative h-48 overflow-hidden">
+          <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+            <div className="text-6xl">
+              <img
+                src={
+                  tool.bannerImage || tool?.bannerImageTemp || tool?.logoTemp
+                }
+                alt={tool?.name}
+              />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
-            <div className="absolute top-4 left-4">
-              <Badge className="primary-gradient text-white shadow-lg">
-                <Star className="h-3 w-3 mr-1" />
-                {tool.rating !== "0.0" ? tool.rating : ""}
-              </Badge>
-            </div>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent group-hover:from-primary/20 transition-all duration-500"></div>
+          <div className="absolute top-4 left-4">
+            <Badge className="primary-gradient text-white shadow-lg">
+              <Star className="h-3 w-3 mr-1" />
+              {tool.rating !== "0.0" ? tool.rating : ""}
+            </Badge>
+          </div>
+          {tool?.id && (
             <div
               className="absolute top-4 right-4 z-10"
               onClick={(e) => {
@@ -130,62 +142,58 @@ const ToolCard = (props: any) => {
                 />
               </div>
             </div>
-          </div>
+          )}
+        </div>
 
-          <CardContent className="p-6">
-            <div className="mb-4">
-              <a
-                target="_blank"
-                href={`/ai-tools/${tool.name?.replace(/\s+/g, "-")}/${tool.id}`}
-                className="no-underline"
-              >
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  {tool.name}
-                </h3>
-              </a>
+        <CardContent className="p-6">
+          <div className="mb-4">
+            <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+              {tool.name}
+            </h3>
+            <p className="text-muted-foreground text-sm font-medium mb-3">
+              {tool.tagline}
+            </p>
+            {tool?.companyName && (
               <p className="text-muted-foreground text-sm font-medium mb-3">
-                {tool.tagline}
-              </p>
-              {tool?.companyName && (
-                <p className="text-muted-foreground text-sm font-medium mb-3">
-                  {tool.companyName}
-                </p>
-              )}
-
-              <p className="text-muted-foreground text-xs leading-relaxed">
-                {/* {tool.overview} */}
-                <p
-                  className="truncate-3-lines"
-                  dangerouslySetInnerHTML={{
-                    __html: tool.overview,
-                  }}
-                ></p>
-              </p>
-            </div>
-
-            {/* Categories */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              {tool.categoryNamesList?.slice(0, 2).map((category, catIndex) => (
-                <Badge
-                  key={catIndex}
-                  variant="secondary"
-                  className="bg-primary/5 text-primary border-primary/20 text-xs capitalize"
-                >
-                  {category}
-                </Badge>
-              ))}
-              {tool.categoryNamesList.length > 2 && (
-                <Badge variant="outline" className="text-xs">
-                  +{tool.categoryNamesList?.length - 2}
-                </Badge>
-              )}
-            </div>
-            {tool?.planType && (
-              <p className="text-muted-foreground text-sm font-medium mb-3 capitalize">
-                {tool.planType}
+                {tool.companyName}
               </p>
             )}
-            {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
+
+            <p className="text-muted-foreground text-xs leading-relaxed">
+              {/* {tool.overview} */}
+              <p
+                className="truncate-3-lines"
+                dangerouslySetInnerHTML={{
+                  __html: tool.overview || tool?.description || "",
+                }}
+              ></p>
+            </p>
+          </div>
+
+          {/* Categories */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {/* {tool?.category_names_list?,length > 0 ?  */}
+            {(tool?.categoryNamesList || tool?.category_names_list || [])?.slice(0, 2).map((category, catIndex) => (
+              <Badge
+                key={catIndex}
+                variant="secondary"
+                className="bg-primary/5 text-primary border-primary/20 text-xs capitalize"
+              >
+                {category}
+              </Badge>
+            ))}
+            {tool?.categoryNamesList?.length > 2 && (
+              <Badge variant="outline" className="text-xs">
+                +{tool?.categoryNamesList?.length - 2}
+              </Badge>
+            )}
+          </div>
+          {tool?.planType && (
+            <p className="text-muted-foreground text-sm font-medium mb-3 capitalize">
+              {tool.planType}
+            </p>
+          )}
+          {/* <div className="flex items-center justify-between pt-4 border-t border-primary/10 mb-4">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <span>{tool.users} users</span>
                   </div>
@@ -196,15 +204,14 @@ const ToolCard = (props: any) => {
                   </div>
                 </div> */}
 
-            {/* View Details Button */}
-            <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
-              View Details
-              <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Button>
-          </CardContent>
-        </Card>
-      </Link>
-    </>
+          {/* View Details Button */}
+          <Button className="w-full group primary-gradient text-white hover:scale-105 transition-all duration-300">
+            View Details
+            <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -74,15 +74,6 @@ const AINews = () => {
     dispatch(fetchAINews(jsonObj));
   };
 
-  const categories = [
-    "All",
-    "Product Launch",
-    "Research",
-    "Regulation",
-    "Funding",
-    "Product Update",
-  ];
-
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -105,6 +96,16 @@ const AINews = () => {
       dispatch(setShowLoginModel(true));
     }
   };
+
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const categoriesToShow = showAllCategories
+    ? newsCategories.filter((c: any) => c?.tool_count > 2)
+    : newsCategories.filter((c: any) => c?.tool_count > 2).slice(0, 4);
+
+  const totalCategories = newsCategories.filter(
+    (c: any) => c?.tool_count > 2
+  ).length;
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
@@ -112,40 +113,45 @@ const AINews = () => {
           {/* Main Content */}
           <div className="flex-1">
             {/* Header */}
-            <div className="mb-12 text-center">
-              <h1 className="text-4xl font-bold mb-4">
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 inline-flex items-center gap-2">
                 <span className="primary-gradient bg-clip-text text-transparent">
                   AI News
                 </span>
+                <span className="text-lg md:text-xl text-muted-foreground font-normal">
+                  - Stay updated with the latest breakthroughs in artificial
+                  intelligence
+                </span>
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
-                Stay updated with the latest developments in artificial
-                intelligence
-              </p>
               <div className="md:text-3xl max-w-6xl mx-auto">
                 <h3 className="font-bold mb-4 text-center">Top Categories</h3>
 
                 <div className="text-center">
-                  {newsCategories.map((category: any) => (
-                    <>
-                      {category?.tool_count > 6 && (
-                        <Button
-                          onClick={() =>
-                            setSelectedCategory(category?.category_name)
-                          }
-                          variant={
-                            selectedCategory === category?.category_name
-                              ? "default"
-                              : "outline"
-                          }
-                          className="m-2 text-transform-capitalize"
-                          key={category?.category_name}
-                        >
-                          {category?.category_name} ({category?.tool_count})
-                        </Button>
-                      )}
-                    </>
+                  {categoriesToShow.map((category: any) => (
+                    <Button
+                      onClick={() =>
+                        setSelectedCategory(category?.category_name)
+                      }
+                      variant={
+                        selectedCategory === category?.category_name
+                          ? "default"
+                          : "outline"
+                      }
+                      className="m-2 text-transform-capitalize"
+                      key={category?.category_name}
+                    >
+                      {category?.category_name} ({category?.tool_count})
+                    </Button>
                   ))}
+                  {totalCategories > 5 && (
+                    <Button
+                      onClick={() => setShowAllCategories(!showAllCategories)}
+                      variant="ghost"
+                      className="m-2 text-primary hover:text-primary/80"
+                    >
+                      {showAllCategories ? "Show Less" : "View All Categories"}
+                    </Button>
+                  )}
                 </div>
               </div>
               {/* Search and Filters */}
@@ -156,7 +162,7 @@ const AINews = () => {
                     placeholder="Search news..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 h-12"
                   />
                 </div>
               </div>

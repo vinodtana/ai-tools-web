@@ -134,7 +134,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     placeholder="Search AI tools..."
                     value={searchQuery}
                     onChange={(e) => {navigate("/ai-tools"); setSearchQuery(e.target.value);}}
-                    className="w-64 pl-9"
+                    className="w-96 pl-9"
                   />
                 </div>
               </div>
