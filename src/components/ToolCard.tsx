@@ -41,7 +41,7 @@ const ToolCard = (props: any) => {
     user,
     userContentLikes,
   } = useAppSelector((state: any) => state.content);
-  console.log("tool", tool);
+  // console.log("tool", tool);
   const handlecontentLike = async (isLiked: boolean) => {
     setLoading(true);
     if (!user?.id) {

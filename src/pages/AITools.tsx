@@ -47,6 +47,8 @@ import { ITEMS_LIMIT } from "../config";
 import Loader from "@/components/Common/Loader";
 import ToolCard from "@/components/ToolCard";
 
+import ToolCardSkeleton from "@/components/ToolCardSkeleton";
+
 const AITools = () => {
   const { category_name } = useParams();
   const navigate = useNavigate();
@@ -120,7 +122,7 @@ const AITools = () => {
     }
     getAllAIToolsList();
   }, [category_name]);
-  const getAllAIToolsList = (searchvv?: string) => {
+  const getAllAIToolsList = async(searchvv?: string) => {
     const jsonObj = {
       page: currentPage,
       limit: ITEMS_LIMIT,
@@ -129,7 +131,9 @@ const AITools = () => {
       user_id: user?.id || ""
     };
     lastFetchRef.current?.abort?.();
-    lastFetchRef.current = dispatch(fetchAITools(jsonObj));
+    setLoading(true);
+    lastFetchRef.current = await dispatch(fetchAITools(jsonObj));
+    setLoading(false);
   };
 
   const startVoiceSearch = () => {
@@ -181,11 +185,11 @@ const AITools = () => {
   const totalCategories = toolCategories.filter(
     (c: any) => c?.tool_count > 50
   ).length;
-
+console.log("loadingloading", loading);
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8">
-        {loading && <Loader />}
+        {/* {loading && <Loader />} */}
         {/* Header */}
         <div className="text-center mb-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2 inline-flex items-center gap-2">
@@ -203,7 +207,13 @@ const AITools = () => {
           <div className="text-center">
             {categoriesToShow.map((category: any) => (
               <Button
-                onClick={() => setSelectedCategory(category?.category_name)}
+                onClick={() =>
+                  setSelectedCategory(
+                    selectedCategory === category?.category_name
+                      ? ""
+                      : category?.category_name
+                  )
+                }
                 variant={
                   selectedCategory === category?.category_name
                     ? "default"
@@ -244,7 +254,14 @@ const AITools = () => {
               className="absolute right-1 top-1/2 -translate-y-1/2"
               aria-label="Start voice search"
             >
-              <Mic className={`h-4 w-4 ${isListening ? "text-primary" : "text-muted-foreground"}`} />
+              {isListening ? (
+                <div className="relative flex items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-6 w-6 rounded-full bg-primary/50 opacity-75"></span>
+                  <Mic className="h-4 w-4 text-primary relative z-10" />
+                </div>
+              ) : (
+                <Mic className="h-4 w-4 text-muted-foreground" />
+              )}
             </Button>
           </div>
 
@@ -282,13 +299,19 @@ const AITools = () => {
           </Select> */}
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {aiTools?.map((tool, index) => {
-            console.log("tool parent", tool);
-            return <ToolCard tool={tool} index={index} />;
-          })}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {[...Array(9)].map((_, index) => (
+              <ToolCardSkeleton key={index} />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {aiTools?.map((tool, index) => (
+              <ToolCard key={tool.id || index} tool={tool} index={index} />
+            ))}
+          </div>
+        )}
 
         <div className="ai-summary-pagination max-w-6xl mx-auto">
           {/* <Pagination

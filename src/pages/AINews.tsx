@@ -130,7 +130,11 @@ const AINews = () => {
                   {categoriesToShow.map((category: any) => (
                     <Button
                       onClick={() =>
-                        setSelectedCategory(category?.category_name)
+                        setSelectedCategory(
+                          selectedCategory === category?.category_name
+                            ? ""
+                            : category?.category_name
+                        )
                       }
                       variant={
                         selectedCategory === category?.category_name
