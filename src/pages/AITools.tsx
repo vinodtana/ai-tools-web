@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +31,7 @@ import {
   ExternalLink,
   Users,
   ArrowRight,
+  Mic,
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
@@ -57,6 +58,8 @@ const AITools = () => {
   const [selectedPricing, setSelectedPricing] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const lastFetchRef = useRef<any>(null);
   const {
     aiTools,
     isLoading,
@@ -78,7 +81,8 @@ const AITools = () => {
   useEffect(() => {
     // page, limit, search, type, status, isActive, categoryIds
     const jsonObj = { page: currentPage, limit: ITEMS_LIMIT };
-    dispatch(fetchAITools(jsonObj));
+    lastFetchRef.current?.abort?.();
+    lastFetchRef.current = dispatch(fetchAITools(jsonObj));
     dispatch(
       fetchToolCategories({
         page: 1,
@@ -122,10 +126,44 @@ const AITools = () => {
       limit: ITEMS_LIMIT,
       search:  searchvv || searchQuery || "",
       category_name: selectedCategory,
+      user_id: user?.id || ""
     };
-    dispatch(fetchAITools(jsonObj));
+    lastFetchRef.current?.abort?.();
+    lastFetchRef.current = dispatch(fetchAITools(jsonObj));
   };
 
+  const startVoiceSearch = () => {
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Voice search not supported",
+          description: "Please use a supported browser like Chrome or Edge.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      setIsListening(true);
+      recognition.onresult = (event: any) => {
+        const transcript = event?.results?.[0]?.[0]?.transcript || "";
+        setSearchQuery(transcript);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
   const handleChangeStatus = (e: any) => {
     setCurrentPage(e);
     // setStatus(e.value);
@@ -196,8 +234,18 @@ const AITools = () => {
               placeholder="Search AI tools..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-12"
+              className="pl-9 pr-10 h-12"
             />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={startVoiceSearch}
+              className="absolute right-1 top-1/2 -translate-y-1/2"
+              aria-label="Start voice search"
+            >
+              <Mic className={`h-4 w-4 ${isListening ? "text-primary" : "text-muted-foreground"}`} />
+            </Button>
           </div>
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>

@@ -15,6 +15,7 @@ import {
   Phone,
   User,
   Settings,
+  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const { user, showLoginModel } = useAppSelector((state: any) => state.content);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCategories({ page: 1, limit: 100, search: searchQuery }));
@@ -46,7 +48,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     getAllAIToolsList();
     } ,[searchQuery])
     const getAllAIToolsList =()=>{
-      const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery};
+      const jsonObj = { page: 1, limit: ITEMS_LIMIT, search: searchQuery, user_id: user?.id || ""};
       dispatch(fetchAITools(jsonObj));  
     }
 
@@ -66,6 +68,40 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
       });
     }
   }, [location.pathname]); // <-- dependency on path
+
+  const startVoiceSearch = () => {
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Voice search not supported",
+          description: "Please use a supported browser like Chrome or Edge.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      setIsListening(true);
+      recognition.onresult = (event: any) => {
+        const transcript = event?.results?.[0]?.[0]?.transcript || "";
+        navigate("/ai-tools");
+        setSearchQuery(transcript);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
 
   const primaryNavigation = [
     { name: "AI Tools", href: "/ai-tools", icon: Bot },
@@ -134,8 +170,18 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                     placeholder="Search AI tools..."
                     value={searchQuery}
                     onChange={(e) => {navigate("/ai-tools"); setSearchQuery(e.target.value);}}
-                    className="w-96 pl-9"
+                    className="w-96 pl-9 pr-10"
                   />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={startVoiceSearch}
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    aria-label="Start voice search"
+                  >
+                    <Mic className={`h-4 w-4 ${isListening ? "text-primary" : "text-muted-foreground"}`} />
+                  </Button>
                 </div>
               </div>
             </div>

@@ -89,10 +89,9 @@ export const fetchNewsCategories= createAsyncThunk(
 
 export const fetchAITools= createAsyncThunk(
   'aiContents/fetchTools',
-  async (params: any) => {
+  async (params: any, { signal }) => {
     const queryString = toQueryParams(params);
-    console.log("params", params);
-    const response = await fetch(`${SERVER_IP}/contents?type=tools&${queryString}`);
+    const response = await fetch(`${SERVER_IP}/contents?type=tools&${queryString}`, { signal });
     return response.json();
   }
 );
