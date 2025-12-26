@@ -17,6 +17,8 @@ import {
   TrendingUp,
   Sparkles,
   Search,
+  Mic,
+  Trophy,
 } from "lucide-react";
 import Layout from "@/components/Layout";
 import heroImage from "@/assets/hero-light.jpg";
@@ -38,7 +40,9 @@ import {
   fetchAITopTools,
   getAllContentLikesByUserId,
 } from "../store/features/contents/contentsSlice";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { SearchInput } from "@/components/SearchInput";
+import { Input } from "@/components/ui/input";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -48,6 +52,10 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPricing, setSelectedPricing] = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+  const lastFetchRef = useRef<any>(null);
 
   const { aiTools, isLoading, pagination, aiCategories, user, topAITools } =
     useAppSelector((state: any) => state.content);
@@ -67,7 +75,77 @@ const Index = () => {
       );
     }
   }, []);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      getAllAIToolsList();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
+  const getAllAIToolsList = async (searchvv?: string) => {
+    const jsonObj = {
+      page: 1,
+      limit: 20,
+      search: searchvv || searchQuery || "",
+      user_id: user?.id || "",
+    };
+
+    // Abort the previous request if it exists
+    if (lastFetchRef.current) {
+      lastFetchRef.current.abort();
+    }
+
+    setLoading(true);
+
+    // Store the promise BEFORE awaiting it
+    const promise = dispatch(fetchAITools(jsonObj));
+    lastFetchRef.current = promise;
+
+    try {
+      await promise;
+    } catch (error) {
+      // Ignore abort errors
+    }
+
+    // Only turn off loading if this is still the latest request
+    if (lastFetchRef.current === promise) {
+      setLoading(false);
+    }
+  };
+
+  const startVoiceSearch = () => {
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition ||
+        (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Voice search not supported",
+          description: "Please use a supported browser like Chrome or Edge.",
+          variant: "destructive",
+        });
+        return;
+      }
+      const recognition = new SpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      setIsListening(true);
+      recognition.onresult = (event: any) => {
+        const transcript = event?.results?.[0]?.[0]?.transcript || "";
+        setSearchQuery(transcript);
+      };
+      recognition.onerror = () => {
+        setIsListening(false);
+      };
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      recognition.start();
+    } catch {
+      setIsListening(false);
+    }
+  };
   const sections = [
     {
       title: "AI Tools",
@@ -325,7 +403,7 @@ const Index = () => {
                 </Button>
               </Link>
             </div>
-
+                
             {/* Trust indicators */}
             <div
               className="mt-6 animate-slide-up"
@@ -355,10 +433,60 @@ const Index = () => {
           </div>
         </div>
       </section>
+      {/* <div className="text-center mb-4 animate-slide-up mt-12">
+          <Badge variant="outline" className="mb-4 px-4 py-1 border-primary/30 text-primary bg-primary/5">
+            <Trophy className="h-3 w-3 mr-2" />
+            Top Rated
+          </Badge>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Top AI Tools
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Discover the most popular and highly rated AI tools in our collection
+          </p>
+        </div> */}
 
-      <TopToolsSection tools={topAITools} />
+      <div className="container mx-auto px-4 mt-4">
+        <div className="relative flex-1 top-section-date-new max-w-2xl mx-auto">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search AI tools for design, coding, marketing, sales…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-10 h-12"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={startVoiceSearch}
+              className="absolute right-1 top-1/2 -translate-y-1/2"
+              aria-label="Start voice search"
+            >
+              {isListening ? (
+                <div className="relative flex items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-6 w-6 rounded-full bg-primary/50 opacity-75"></span>
+                  <Mic className="h-4 w-4 text-primary relative z-10" />
+                </div>
+              ) : (
+                <Mic className="h-4 w-4 text-muted-foreground" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
 
-      <FeaturedToolsSection tools={aiTools} />
+      <TopToolsSection
+        tools={topAITools}
+        loading={loading}
+        searchQuery={searchQuery}
+        aiTools={aiTools}
+      />
+      {searchQuery==="" && (
+          <FeaturedToolsSection tools={aiTools} />
+      )}
+      
 
       {/* Explore Our Sections */}
       <section className="py-20 bg-muted/30 relative overflow-hidden">

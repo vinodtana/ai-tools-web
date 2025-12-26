@@ -1,29 +1,25 @@
 import ToolCard from "@/components/ToolCard";
 import { Badge } from "@/components/ui/badge";
 import { Trophy } from "lucide-react";
+import ToolCardSkeleton from "@/components/ToolCardSkeleton";
 
-const TopToolsSection = ({ tools }: { tools: any[] }) => {
+const TopToolsSection = ({ tools, searchQuery, aiTools, loading }: { tools: any[]; searchQuery: string; aiTools: any[]; loading: boolean }) => {
+
+  const display_tools = searchQuery!==""?aiTools: tools;
   return (
     <section className="py-12 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12 animate-slide-up">
-          <Badge variant="outline" className="mb-4 px-4 py-1 border-primary/30 text-primary bg-primary/5">
-            <Trophy className="h-3 w-3 mr-2" />
-            Top Rated
-          </Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Top AI Tools
-          </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Discover the most popular and highly rated AI tools in our collection
-          </p>
-        </div>
-
+        
+        {loading? <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            {[...Array(9)].map((_, index) => (
+              <ToolCardSkeleton key={index} />
+            ))} </div>:
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tools?.map((tool, index) => (
+          {display_tools?.map((tool, index) => (
             <ToolCard key={tool.id || index} tool={tool} index={index} />
           ))}
         </div>
+        }
       </div>
     </section>
   );
