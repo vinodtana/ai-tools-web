@@ -122,7 +122,7 @@ const AITools = () => {
     }
     getAllAIToolsList();
   }, [category_name]);
-  const getAllAIToolsList = async(searchvv?: string) => {
+ const getAllAIToolsList = async(searchvv?: string) => {
     const jsonObj = {
       page: currentPage,
       limit: ITEMS_LIMIT,
@@ -130,10 +130,28 @@ const AITools = () => {
       category_name: selectedCategory,
       user_id: user?.id || ""
     };
-    lastFetchRef.current?.abort?.();
+
+    // Abort the previous request if it exists
+    if (lastFetchRef.current) {
+      lastFetchRef.current.abort();
+    }
+
     setLoading(true);
-    lastFetchRef.current = await dispatch(fetchAITools(jsonObj));
-    setLoading(false);
+    
+    // Store the promise BEFORE awaiting it
+    const promise = dispatch(fetchAITools(jsonObj));
+    lastFetchRef.current = promise;
+
+    try {
+      await promise;
+    } catch (error) {
+      // Ignore abort errors
+    }
+
+    // Only turn off loading if this is still the latest request
+    if (lastFetchRef.current === promise) {
+      setLoading(false);
+    }
   };
 
   const startVoiceSearch = () => {
@@ -237,11 +255,16 @@ console.log("loadingloading", loading);
           </div>
         </div>
         {/* Filters */}
+        {/* <div className="md:text-2xl max-w-6xl mx-auto mt-4 mb-8">
+         <p>Explore thousands of AI tools across design, development, marketing, sales, automation, and more — all in one place to save time and choose smarter.</p>
+
+        </div> */}
         <div className="mb-8 flex flex-col sm:flex-row gap-4 max-w-6xl mx-auto mt-2 ">
+
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Search AI tools..."
+              placeholder="Search AI tools for design, coding, marketing, sales…"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-10 h-12"
