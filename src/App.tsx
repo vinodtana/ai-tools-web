@@ -25,6 +25,7 @@ import Contact from "./pages/Contact";
 import Newsletter from "./pages/Newsletter";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
+import Login from "./pages/Login";
 
 const queryClient = new QueryClient();
 
@@ -38,7 +39,7 @@ const App = () => (
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/login" element={<AITools />} />
+          <Route path="/login" element={<Login />} />
           
           {/* AI Tools Routes */}
           <Route path="/ai-tools" element={<AITools />} />
