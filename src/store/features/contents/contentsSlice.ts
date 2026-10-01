@@ -292,6 +292,7 @@ const aiContentsSlice = createSlice({
       console.log('Login successful:', action.payload);
       const uData = {...action.payload?.data?.user, token: action.payload?.data.token};
       state.user = uData;
+      console.log("uData",uData);
       state.token = action.payload?.data.token;
       localStorage.setItem('user', JSON.stringify(uData));
       localStorage.setItem('token', action.payload?.data.token);

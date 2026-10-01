@@ -34,13 +34,16 @@ export default function AuthForm({ onAuthenticated, className }: AuthFormProps) 
   }, [loginData, signupData]);
 
   useEffect(() => {
+    console.log("user auth form",user);
     if (user && user?.id) {
       onAuthenticated?.();
     }
   }, [user, onAuthenticated]);
 
   const closeModel = () => {};
-  const navigateUserSocial = (_udata: unknown) => {};
+  const navigateUserSocial = (_udata: unknown) => {
+      console.log(_udata);
+  };
 
   const extractErrorMessage = (action: unknown): string | undefined => {
     if (!action || typeof action !== "object") return;
