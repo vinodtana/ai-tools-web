@@ -29,6 +29,9 @@ import {
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildArticleLd, type BreadcrumbItem } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel, toMetaKeywords, hasFreePlan, classifyPricing } from "@/lib/seo";
 
 const ArticleDetail = () => {
   const { id } = useParams();
@@ -106,6 +109,55 @@ const ArticleDetail = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title={`${cDetails?.name || "AI Article"} – AI Expert Article`}
+        description={truncate(stripHtml(
+          Array.isArray(cDetails?.overviewList)
+            ? cDetails.overviewList.join(" ")
+            : cDetails?.overview || cDetails?.tagline || cDetails?.description || "Expert AI article with tutorials, industry analysis, and practical guides for using AI tools effectively."
+        ), 160)}
+        canonicalPath={`/ai-articles/${encodeURIComponent((cDetails?.name || "").replace(/\s+/g, "-"))}/${id || ""}`}
+        image={cDetails?.bannerImage || cDetails?.bannerImageTemp || cDetails?.logo || cDetails?.logoTemp || DEFAULT_OG_IMAGE}
+        imageAlt={cDetails?.name || "AI Article"}
+        type="article"
+        publishedTime={cDetails?.createdAt || cDetails?.publishDate || undefined}
+        modifiedTime={cDetails?.updatedAt || undefined}
+        author={cDetails?.authorBy || cDetails?.author || undefined}
+        section={cDetails?.category || (cDetails?.categoryNamesList?.[0]) || undefined}
+        tags={cDetails?.tags || []}
+      />
+      <JsonLd
+        id="article-detail-breadcrumb"
+        data={buildBreadcrumbListLd([
+          { label: "Home", path: "/" },
+          { label: "AI Articles", path: "/ai-articles" },
+          { label: cDetails?.name || "Article" },
+        ] as BreadcrumbItem[])}
+      />
+      <JsonLd
+        id="article-detail-article"
+        data={buildArticleLd({
+          headline: cDetails?.name || "AI Article",
+          description: truncate(stripHtml(
+            Array.isArray(cDetails?.overviewList)
+              ? cDetails.overviewList.join(" ")
+              : cDetails?.overview || cDetails?.tagline || cDetails?.description || ""
+          ), 5000),
+          url: buildCanonical(`/ai-articles/${encodeURIComponent((cDetails?.name || "").replace(/\s+/g, "-"))}/${id || ""}`),
+          image: cDetails?.bannerImage || cDetails?.bannerImageTemp || cDetails?.logo || cDetails?.logoTemp || DEFAULT_OG_IMAGE,
+          author: cDetails?.authorBy || cDetails?.author || "TopAITools.ai Team",
+          datePublished: cDetails?.createdAt || cDetails?.publishDate || undefined,
+          dateModified: cDetails?.updatedAt || undefined,
+          articleBody: stripHtml(
+            Array.isArray(cDetails?.overviewList)
+              ? cDetails.overviewList.join("\n\n")
+              : cDetails?.overview || cDetails?.tagline || ""
+          ),
+          articleSection: cDetails?.category || (cDetails?.categoryNamesList?.[0]) || undefined,
+          keywords: Array.isArray(cDetails?.tags) ? cDetails.tags : (cDetails?.categoryNamesList || []),
+          mainEntityOfPage: true,
+        })}
+      />
       <ShareModal
         show={openShareModel}
         url={shareURL}

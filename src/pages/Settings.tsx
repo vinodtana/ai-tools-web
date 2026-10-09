@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Settings as SettingsIcon, User, Bell, Shield, Save } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { SeoHead } from "@/components/SeoHead";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +37,14 @@ const Settings = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title="Account Settings"
+        description=""
+        noindex={true}
+        nofollow={true}
+        canonicalPath={null as any}
+        includeSiteInTitle={false}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold mb-2 primary-gradient bg-clip-text text-transparent">

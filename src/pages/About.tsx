@@ -3,6 +3,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Target, Users, Award, Lightbulb, Globe, Heart, TrendingUp, ArrowRight } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { Link } from 'react-router-dom';
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildOrganizationLd } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 
 const About = () => {
   const mission = [
@@ -23,8 +26,30 @@ const About = () => {
     }
   ];
 
+  const canonicalPath = "/about";
+  const seoTitle = "About TopAITools.ai – Our Mission & Team";
+  const seoDescription = "TopAITools.ai is an independent AI tools directory, research platform and publication helping professionals discover, compare and get the most out of artificial intelligence tools. Trusted by 50K+ AI enthusiasts worldwide.";
+
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "About", path: canonicalPath },
+  ];
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+  const organizationLd = buildOrganizationLd({
+    description: seoDescription,
+  });
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={canonicalPath}
+        type="website"
+        includeSiteInTitle={false}
+      />
+      <JsonLd id="breadcrumb-list-about" data={breadcrumbListLd} />
+      <JsonLd id="organization-about" data={organizationLd} />
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl font-bold mb-6 primary-gradient bg-clip-text text-transparent">

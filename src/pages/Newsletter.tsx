@@ -5,6 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Mail, CheckCircle, Calendar, Users, Zap, TrendingUp, Bell, Star } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildOrganizationLd } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -25,9 +28,31 @@ const Newsletter = () => {
     }
   };
 
+  const canonicalPath = "/newsletter";
+  const seoTitle = "AI Newsletter – Weekly AI Tools, News & Prompts | TopAITools.ai";
+  const seoDescription = "Subscribe to the TopAITools weekly newsletter: get new AI tools, curated ChatGPT prompts, latest AI news updates and exclusive expert tips delivered every week. 100% free, unsubscribe anytime.";
+
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "Newsletter", path: canonicalPath },
+  ];
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+  const organizationLd = buildOrganizationLd({
+    description: seoDescription,
+  });
+
   if (isSubscribed) {
     return (
       <Layout>
+        <SeoHead
+          title={seoTitle}
+          description={seoDescription}
+          canonicalPath={canonicalPath}
+          type="website"
+          includeSiteInTitle={false}
+        />
+        <JsonLd id="breadcrumb-list-newsletter" data={breadcrumbListLd} />
+        <JsonLd id="organization-newsletter" data={organizationLd} />
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-2xl mx-auto text-center animate-fade-in">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -45,6 +70,15 @@ const Newsletter = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={canonicalPath}
+        type="website"
+        includeSiteInTitle={false}
+      />
+      <JsonLd id="breadcrumb-list-newsletter" data={breadcrumbListLd} />
+      <JsonLd id="organization-newsletter" data={organizationLd} />
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-16 animate-fade-in">
           <Mail className="h-16 w-16 text-primary mx-auto mb-6" />

@@ -6,6 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Mail, Send, CheckCircle } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -59,9 +62,27 @@ const Contact = () => {
   };
 }
 
+  const canonicalPath = "/contact";
+  const seoTitle = "Contact TopAITools.ai – Get in Touch";
+  const seoDescription = "Contact the TopAITools team. Report a bug, suggest an AI tool for listing, partner with us, share feedback, or ask questions about our AI directory and comparison platform.";
+
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "Contact", path: canonicalPath },
+  ];
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+
   if (isSubmitted) {
     return (
       <Layout>
+        <SeoHead
+          title="Contact TopAITools.ai – Get in Touch"
+          description="Contact the TopAITools team. Report a bug, suggest an AI tool for listing, partner with us, share feedback, or ask questions about our AI directory and comparison platform."
+          canonicalPath="/contact"
+          type="website"
+          includeSiteInTitle={false}
+        />
+        <JsonLd id="breadcrumb-list-contact" data={breadcrumbListLd} />
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-2xl mx-auto text-center animate-fade-in">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -79,6 +100,14 @@ const Contact = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={canonicalPath}
+        type="website"
+        includeSiteInTitle={false}
+      />
+      <JsonLd id="breadcrumb-list-contact" data={breadcrumbListLd} />
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl font-bold mb-6 primary-gradient bg-clip-text text-transparent">

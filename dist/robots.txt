@@ -1,0 +1,178 @@
+# TopAITools.ai Robots.txt
+# Crawler policy:
+# - Public search and AI-answer crawlers are allowed on all public, content-rich pages.
+# - Training-only crawlers (GPTBot, Google-Extended, ClaudeBot) are blocked to protect content rights.
+# - IMPORTANT: This robots.txt is advisory only. Also enforce at CDN/WAF/firewall for security-sensitive routes.
+# - Sitemaps are generated via scripts/generate-sitemap.mjs from LIVE API data.
+
+Sitemap: https://www.topaitools.ai/sitemap.xml
+
+# ----------------------------------------------------------------------
+# # 1) SEARCH & ANSWER CRAWLERS — ALLOW (search visibility is primary goal)
+# ----------------------------------------------------------------------
+
+# Google primary search crawler — full access
+User-agent: Googlebot
+Allow: /
+# Do NOT block /assets/, /dist/, images, JS, CSS — Google needs these to render.
+# Rate-limited Google sub-crawlers treated same for SEO
+User-agent: Googlebot-Image
+Allow: /
+User-agent: Googlebot-News
+Allow: /
+User-agent: Googlebot-Video
+Allow: /
+User-agent: GoogleOther
+Allow: /
+User-agent: Googlebot-Extended
+Allow: /
+
+# Bing primary search crawler
+User-agent: Bingbot
+Allow: /
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+
+# Yahoo
+User-agent: Slurp
+Allow: /
+
+# Yandex
+User-agent: Yandex
+Allow: /
+
+# Baidu (optional global reach)
+User-agent: Baiduspider
+Allow: /
+
+# ----------------------------------------------------------------------
+# # 2) AI SEARCH / ANSWER ENGINES — ALLOW (these = search engines 2026+)
+# ----------------------------------------------------------------------
+
+# OpenAI Search crawler — fetches content cited in ChatGPT Search / SearchGPT
+User-agent: OAI-SearchBot
+Allow: /
+
+# Perplexity AI search crawler
+User-agent: PerplexityBot
+Allow: /
+User-agent: Perplexity-Render
+Allow: /
+
+# Anthropic Claude in-browser search / cited sources fetcher
+User-agent: ClaudeBot
+Disallow: /
+User-agent: Claude-SearchBot
+Allow: /
+User-agent: Claude-User
+Allow: /
+
+# ChatGPT surface user-agent (browsing tool)
+User-agent: ChatGPT-User
+Allow: /
+
+# Google Gemini in-product browsing
+User-agent: Google-Extended
+Disallow: /
+
+# Meta AI search
+User-agent: Meta-ExternalAgent
+Allow: /
+User-agent: FacebookExternalHit
+Allow: /
+
+# Twitter card scraper (for unfurl)
+User-agent: Twitterbot
+Allow: /
+User-agent: Twitterbot/1.0
+Allow: /
+
+# LinkedIn scraper (for share previews)
+User-agent: LinkedInBot
+Allow: /
+User-agent: LinkedInBot/1.0
+Allow: /
+
+# Discord / Slack / Telegram unfurl
+User-agent: facebookexternalhit
+Allow: /
+User-agent: Slackbot
+Allow: /
+User-agent: TelegramBot
+Allow: /
+User-agent: Discordbot
+Allow: /
+
+# You.com search
+User-agent: YouBot
+Allow: /
+
+# Brave search
+User-agent: Bravebot
+Allow: /
+User-agent: AdsBot-Brave
+Allow: /
+
+# ----------------------------------------------------------------------
+# # 3) PURE MODEL TRAINING / SCREEN-SCRAPE CRAWLERS — DISALLOW (no SEO benefit)
+# ----------------------------------------------------------------------
+
+# Common Crawl base (often used for training sets)
+User-agent: CCBot
+Disallow: /
+
+# GPTBot — OpenAI training crawler (NOT search)
+User-agent: GPTBot
+Disallow: /
+
+# DataForSeo / SEMrush / Ahrefs-type scrapers
+User-agent: SemrushBot
+Disallow: /
+User-agent: SemrushBot-SI
+Disallow: /
+User-agent: AhrefsBot
+Disallow: /
+User-agent: MJ12bot
+Disallow: /
+
+# Generic AI scraping
+User-agent: Bytespider
+Disallow: /
+User-agent: Bytedance
+Disallow: /
+User-agent: PetalBot
+Disallow: /
+User-agent: Applebot
+Allow: /
+User-agent: anthropic-ai
+Disallow: /
+User-agent: Claude
+Disallow: /
+
+# ----------------------------------------------------------------------
+# # 4) ACCOUNT & SENSITIVE PATHS — DISALLOW for every crawler
+# ----------------------------------------------------------------------
+
+# Note: Crawlers can still request these! Robots.txt is ONLY advisory.
+# Private/account routes are client-side gated AND should be 401'd server-side.
+
+User-agent: *
+Disallow: /login
+Disallow: /profile
+Disallow: /settings
+Disallow: /api/
+Disallow: /search?
+Disallow: /*?s=
+Disallow: /*?filter=
+Disallow: /*?sort=
+Disallow: /*?utm_
+Disallow: /*?ref=
+Disallow: /*?fbclid=
+Disallow: /*?gclid=
+Disallow: /*?msclkid=
+
+# Allow all other pages by default
+User-agent: *
+Allow: /

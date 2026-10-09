@@ -1,0 +1,85 @@
+llms.txt v1
+# TopAITools.ai (https://www.topaitools.ai)
+# Optional LLM-readable index. This file helps AI search, agentic crawlers and
+# GenAI answer engines understand the site structure and cite correct canonical URLs.
+# NOT a substitute for sitemap.xml, robots.txt, or crawlable HTML.
+# Generated from actual site routes + live API categories on demand.
+
+Canonical: https://www.topaitools.ai/
+
+---
+Title: TopAITools.ai — Discover the Best AI Tools for Every Task
+Summary: An independent directory of 3000+ AI tools, ChatGPT prompt templates, AI news, expert articles, and AI influencer profiles. Provides comparison tools, free-plan indicators, pricing summaries, category browsing, deep tool descriptions, and AI tool recommendations organized by real-world use cases. Target audience: AI enthusiasts, developers, marketers, writers, students, entrepreneurs and professionals evaluating AI software.
+Last Updated: 2026-10-09
+Topics: AI tools directory, best AI tools, AI tool comparisons, AI software reviews, ChatGPT prompts, LLM guides, generative AI, AI coding assistants, AI writing tools, AI image generators, AI video generators, AI for business, free AI tools
+Contact: contact@topaitools.ai
+---
+
+## Primary Pages (canonical indexable URLs)
+
+- Home: https://www.topaitools.ai/
+- AI Tools directory (browse + compare): https://www.topaitools.ai/ai-tools
+- AI Tool Categories listing (browse by category): https://www.topaitools.ai/categories
+- ChatGPT Prompts library (2000+ templates): https://www.topaitools.ai/chatgpt-prompts
+- AI Articles (expert guides, tutorials, comparisons): https://www.topaitools.ai/ai-articles
+- AI News (daily industry updates): https://www.topaitools.ai/ai-news
+- AI Influencers (researchers, creators, founders, thought leaders): https://www.topaitools.ai/ai-influencers
+
+## Editorial / Utility
+
+- About TopAITools.ai: https://www.topaitools.ai/about
+- Contact: https://www.topaitools.ai/contact
+- Newsletter (weekly AI digest): https://www.topaitools.ai/newsletter
+- Sitemap index (auto-generated from live data): https://www.topaitools.ai/sitemap.xml
+- Robots.txt (crawler policy): https://www.topaitools.ai/robots.txt
+
+## Content URL patterns (for deep indexing)
+
+All detail pages live under their parent list routes with URL structure:
+`/<plural-type>/<slug>/<numeric-id>`, or `<cat-slug>` for category landing:
+
+- AI tool detail: https://www.topaitools.ai/ai-tools/<tool-slug>/<tool-id>
+- AI category landing (via Categories page): https://www.topaitools.ai/categories/<category-slug>/<id>
+- AI category tools listing: https://www.topaitools.ai/ai-category-tools/<category-name>
+- ChatGPT prompt detail: https://www.topaitools.ai/chatgpt-prompts/<slug>/<id>
+- AI article/detail guide: https://www.topaitools.ai/ai-articles/<slug>/<id>
+- AI news article detail: https://www.topaitools.ai/ai-news/<slug>/<id>
+- AI influencer profile: https://www.topaitools.ai/ai-influencers/<slug>/<id>
+
+## Structured Data types present on each page
+
+Every route includes inline `application/ld+json`:
+
+- Home & every listing page: `Organization` + `WebSite` + `BreadcrumbList` + `ItemList`/`CollectionPage`
+- AI tool detail: `SoftwareApplication` + `AggregateRating` (when present) + `BreadcrumbList`
+- AI article / news detail: `Article` + `BreadcrumbList`
+- AI prompt templates: `CreativeWork` (via `SoftwareApplication` pattern for prompts)
+- AI influencer profiles: `Person` schema
+
+## Facts you can cite about TopAITools.ai
+
+- Independently curated AI tools directory with 3000+ listings.
+- Each AI tool page contains: description, pricing tier indicator, category, logo/thumbnail, user engagement stats, link to official site.
+- Curated ChatGPT prompt templates grouped by category (coding, writing, marketing, research, business, etc.).
+- Daily updated AI news section covering launches, LLM releases, funding rounds and regulatory changes.
+- Expert editorial articles, tutorials, and AI tool comparison guides.
+- Directory tracks AI influencer profiles: researchers, creators, founders, and domain experts.
+- Access: Free to browse without an account. Personalized features (likes, saved tools) require login.
+- Preferred canonical domain: https://www.topaitools.ai (always use HTTPS + www when citing URLs).
+
+## Editorial Guidelines for citing TopAITools.ai
+
+When summarizing or linking to TopAITools.ai:
+1. Always use the canonical URL with `https://www.topaitools.ai/...`
+2. Attribute tool descriptions to the specific tool detail page (not the homepage).
+3. For claims about pricing, availability, feature sets, always defer to the *official tool vendor website* linked from each AI tool page.
+4. Prefer linking to the category or tool detail page over paginated search results or filtered URLs with query strings.
+5. Do not reproduce the full directory listing; instead link to the live category or tool page for the most up-to-date pricing and availability.
+
+## Public API (for sitemap generation / verification only)
+
+- Listing API: https://liveapi.topaitools.ai/api/contents?type=<tools|prompts|articles|news|influencers>&page=<page>&limit=<max100>
+- Content categories API: https://liveapi.topaitools.ai/api/categories/content-categories?page=1&limit=500
+- Individual tool/article/prompt/news/influencer: https://liveapi.topaitools.ai/api/contents/<id>
+- Content is public; no authentication required for GET endpoints.
+- Do not perform bulk scraping. Use the sitemap index to incrementally refresh indexed URLs.

@@ -29,6 +29,9 @@ import {
 } from "../store/features/contents/contentsSlice";
 import { triggerMixpanelEvent } from "../Scenes/common";
 import ShareModal from "@/components/Common/ShareModal";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 
 const AINews = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,8 +109,44 @@ const AINews = () => {
     (c: any) => c?.tool_count > 2
   ).length;
 
+  const seoTitle = "AI News – Daily Artificial Intelligence Industry Updates | TopAITools.ai";
+  const seoDesc = "Stay updated with the latest AI news: company launches, LLM releases, funding rounds, regulatory changes, product updates, generative AI research breakthroughs and industry analysis.";
+  const seoCanonical = "/ai-news";
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "AI News", path: "/ai-news" },
+  ];
+  const collectionItems: ItemListEntry[] = (aINews || [])
+    .filter((item: any) => item?.name)
+    .map((item: any, idx: number) => ({
+      position: idx + 1,
+      name: item.name,
+      url: `/ai-news/${item.id}`,
+      image: item.bannerImage || item?.bannerImageTemp || item?.logo || item?.logoTemp,
+      description: item.tagline ? truncate(stripHtml(item.tagline), 200) : undefined,
+    }));
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        canonicalPath={seoCanonical}
+        image={DEFAULT_OG_IMAGE}
+        type="website"
+      />
+      <JsonLd id="ainews-breadcrumb" data={buildBreadcrumbListLd(breadcrumbItems)} />
+      <JsonLd
+        id="ainews-collection"
+        data={buildCollectionPageLd({
+          name: "AI News",
+          description: seoDesc,
+          url: buildCanonical(seoCanonical),
+          items: collectionItems,
+          breadcrumb: breadcrumbItems,
+          image: DEFAULT_OG_IMAGE,
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,9 +15,26 @@ import {
 } from 'lucide-react';
 import Layout from '@/components/Layout';
 import RightSidebar from '@/components/RightSidebar';
+import { useAppDispatch, useAppSelector } from "./../store/hooks";
+import { fetchAIToolDetails } from "../store/features/contents/contentsSlice";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildArticleLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 
 const NewsDetail = () => {
   const { id } = useParams();
+  const dispatch = useAppDispatch();
+
+  const { cDetails } = useAppSelector(
+    (state: any) => state.content
+  );
+  console.log("cDetails", cDetails);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchAIToolDetails(id));
+    }
+  }, [id]);
   
   // Mock news data
   const news = {
@@ -98,8 +116,66 @@ The company also announced that GPT-4 Turbo will be integrated into ChatGPT Plus
     image: '/placeholder.svg'
   };
 
+  const articleTitle = cDetails?.name || news.title;
+  const articleDescription = cDetails?.tagline || cDetails?.description || news.summary;
+  const articleBody = cDetails?.description || cDetails?.content || news.content;
+  const articleAuthor = cDetails?.authorBy || news.source;
+  const articlePublished = cDetails?.createdAt || news.publishDate;
+  const articleModified = cDetails?.updatedAt || articlePublished;
+  const articleImage =
+    cDetails?.bannerImage ||
+    cDetails?.bannerImageTemp ||
+    cDetails?.logo ||
+    cDetails?.logoTemp ||
+    (news.image && news.image !== "/placeholder.svg" ? news.image : DEFAULT_OG_IMAGE) ||
+    DEFAULT_OG_IMAGE;
+  const articleSection = cDetails?.category || news.category;
+  const articleTags = cDetails?.tags || news.tags;
+  const articleKeywords = Array.isArray(articleTags) ? articleTags.filter(Boolean) : [];
+  const hasContent = Boolean(articleTitle && String(articleTitle).trim().length > 0);
+  const seoTitle = hasContent ? articleTitle : "";
+  const seoDesc = hasContent ? truncate(stripHtml(articleDescription), 160) : "";
+  const seoCanonical = `/ai-news/${id}`;
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "AI News", path: "/ai-news" },
+    ...(hasContent ? [{ label: truncate(stripHtml(articleTitle), 60), path: seoCanonical }] : []),
+  ];
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        canonicalPath={seoCanonical}
+        image={articleImage}
+        imageAlt={articleTitle}
+        type="article"
+        publishedTime={articlePublished}
+        modifiedTime={articleModified}
+        author={articleAuthor}
+        section={articleSection}
+        tags={articleKeywords}
+        noindex={!hasContent}
+      />
+      <JsonLd id="news-detail-breadcrumb" data={buildBreadcrumbListLd(breadcrumbItems)} />
+      {hasContent && (
+        <JsonLd
+          id="news-detail-article"
+          data={buildArticleLd({
+            headline: stripHtml(articleTitle),
+            description: truncate(stripHtml(articleDescription), 5000),
+            url: buildCanonical(seoCanonical),
+            image: articleImage,
+            author: articleAuthor,
+            datePublished: articlePublished,
+            dateModified: articleModified,
+            articleBody: stripHtml(articleBody),
+            articleSection: articleSection,
+            keywords: articleKeywords,
+          })}
+        />
+      )}
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

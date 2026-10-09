@@ -2,6 +2,9 @@ import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildArticleLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 import { 
   ArrowLeft, 
   ExternalLink, 
@@ -45,9 +48,74 @@ const InfluencerDetail = () => {
       
     }, []);
   
-  
+  const { name } = useParams();
+  const canonicalPath = `/ai-influencers/${name}/${id}`;
+  const influencerName = cDetails?.name || "AI Influencer";
+  const seoTitle = `${influencerName} – Profile, AI Expertise & Content | TopAITools.ai`;
+  const seoDescription = truncate(
+    stripHtml(cDetails?.bio || cDetails?.overview || `Learn about ${influencerName}, their AI expertise, key contributions, achievements, and latest content on TopAITools.ai.`),
+    160
+  );
+
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "AI Influencers", path: "/ai-influencers" },
+    { label: influencerName },
+  ];
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+
+  const socialUrls: string[] = [];
+  if (cDetails?.socialLinks?.twitter) socialUrls.push(cDetails.socialLinks.twitter);
+  if (cDetails?.socialLinks?.linkedin) socialUrls.push(cDetails.socialLinks.linkedin);
+  if (cDetails?.socialLinks?.youtube) socialUrls.push(cDetails.socialLinks.youtube);
+  if (cDetails?.socialLinks?.website) socialUrls.push(cDetails.socialLinks.website);
+
+  const personLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: influencerName,
+    url: buildCanonical(canonicalPath),
+    image: cDetails?.avatar || DEFAULT_OG_IMAGE,
+    description: seoDescription,
+    jobTitle: cDetails?.tagline || undefined,
+    worksFor: cDetails?.company ? { "@type": "Organization", name: cDetails.company } : undefined,
+    address: cDetails?.location
+      ? { "@type": "PostalAddress", addressLocality: cDetails.location }
+      : undefined,
+    sameAs: socialUrls.length > 0 ? socialUrls : undefined,
+    knowsAbout: cDetails?.specialties?.length ? cDetails.specialties : undefined,
+  };
+
+  const articleLd = buildArticleLd({
+    headline: `${influencerName} – AI Profile, Expertise & Content`,
+    description: seoDescription,
+    url: buildCanonical(canonicalPath),
+    image: cDetails?.avatar || null,
+    author: cDetails?.name || "AI Influencer",
+    datePublished: cDetails?.createdAt || null,
+    dateModified: cDetails?.updatedAt || cDetails?.createdAt || null,
+    articleBody: stripHtml(cDetails?.overview || cDetails?.bio || "") || undefined,
+    articleSection: "AI Influencers",
+    keywords: cDetails?.specialties || [],
+  });
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={canonicalPath}
+        image={cDetails?.avatar || null}
+        type="profile"
+        includeSiteInTitle={false}
+        publishedTime={cDetails?.createdAt || null}
+        modifiedTime={cDetails?.updatedAt || null}
+        tags={cDetails?.specialties}
+        section="AI Influencers"
+      />
+      <JsonLd id={`breadcrumb-list-influencer-${id}`} data={breadcrumbListLd} />
+      <JsonLd id={`person-influencer-${id}`} data={personLd} />
+      <JsonLd id={`article-influencer-${id}`} data={articleLd} />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

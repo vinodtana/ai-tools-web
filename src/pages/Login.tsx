@@ -1,5 +1,6 @@
 import AuthForm from "@/components/AuthForm";
 import Layout from "@/components/Layout";
+import { SeoHead } from "@/components/SeoHead";
 import { Card, CardContent } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,14 @@ const Login = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title="Login"
+        description=""
+        noindex={true}
+        nofollow={true}
+        canonicalPath={null as any}
+        includeSiteInTitle={false}
+      />
       <div className="container mx-auto px-4 py-10">
         <div className="mx-auto w-full max-w-md">
           <Card>

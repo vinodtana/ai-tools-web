@@ -30,6 +30,9 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchACategoryDetails } from "../store/features/contents/contentsSlice";
 import { useState, useEffect } from "react";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 const CategoryDetail = () => {
   const { name, id } = useParams();
  const navigate = useNavigate();
@@ -40,7 +43,7 @@ const CategoryDetail = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPricing, setSelectedPricing] = useState("all");
 
-  const { aiTools, isLoading, pagination, aiCategories } = useAppSelector(
+  const { aiTools, isLoading, pagination, aiCategories, cDetails } = useAppSelector(
     (state: any) => state.content
   );
   console.log("aiTools", aiTools);
@@ -211,8 +214,46 @@ The business impact of conversational AI is substantial, with organizations seei
     }
   ];
 
+  const categoryLabel = slugToLabel(name || "");
+  const seoTitle = `Best ${categoryLabel} Tools – Compare, Pricing & Reviews | TopAITools.ai`;
+  const seoDescRaw = cDetails?.description
+    ? cDetails.description
+    : `Discover the best AI tools in ${categoryLabel} category. Compare top-rated tools, pricing, free plan availability, user reviews, and expert alternatives.`;
+  const seoDesc = truncate(stripHtml(seoDescRaw), 160);
+  const seoCanonical = id ? `/categories/${name}/${id}` : `/categories/${name}`;
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "Categories", path: "/categories" },
+    { label: categoryLabel, path: seoCanonical },
+  ];
+  const collectionItems: ItemListEntry[] = categoryTools.map((tool, idx) => ({
+    position: idx + 1,
+    name: tool.name,
+    url: `/ai-tools/${tool.id}`,
+    description: tool.tagline ? truncate(stripHtml(tool.tagline), 200) : undefined,
+  }));
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        canonicalPath={seoCanonical}
+        image={DEFAULT_OG_IMAGE}
+        type="website"
+      />
+      <JsonLd id="category-detail-breadcrumb" data={buildBreadcrumbListLd(breadcrumbItems)} />
+      <JsonLd
+        id="category-detail-collection"
+        data={buildCollectionPageLd({
+          name: `Best ${categoryLabel} AI Tools`,
+          description: seoDesc,
+          url: buildCanonical(seoCanonical),
+          items: collectionItems,
+          breadcrumb: breadcrumbItems,
+          image: DEFAULT_OG_IMAGE,
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

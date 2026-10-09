@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { User, Mail, Calendar, Edit, Save, Star, Bookmark } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { SeoHead } from "@/components/SeoHead";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -52,6 +53,14 @@ useEffect(() => {
   const uemailchat = user?.email?.charAt(0);
   return (
     <Layout>
+      <SeoHead
+        title="My Profile"
+        description=""
+        noindex={true}
+        nofollow={true}
+        canonicalPath={null as any}
+        includeSiteInTitle={false}
+      />
       <div className="container mx-auto px-4 py-8">
         <Card className="mb-8 hover:shadow-2xl transition-all duration-500 animate-fade-in">
           <CardContent className="p-8">

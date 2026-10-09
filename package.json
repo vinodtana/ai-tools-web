@@ -8,7 +8,12 @@
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sitemap:generate": "node scripts/generate-sitemap.mjs",
+    "sitemap:validate": "node scripts/validate-sitemap.mjs",
+    "sitemap:validate:http": "node scripts/validate-sitemap.mjs --http",
+    "seo:build": "vite build && node scripts/generate-sitemap.mjs SITEMAP_OUT_DIR=./dist && node scripts/validate-sitemap.mjs",
+    "tsc:noEmit": "tsc --noEmit"
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",

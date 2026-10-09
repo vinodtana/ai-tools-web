@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 import { 
   Search, 
   Users, 
@@ -64,8 +67,48 @@ const [searchTerm, setSearchTerm] = useState('');
     return count?.toString();
   };
 
+  const canonicalPath = "/ai-influencers";
+  const seoTitle = "AI Influencers – Thought Leaders, Experts & Creators to Follow | TopAITools.ai";
+  const seoDescription = "Discover top AI influencers, researchers, creators and thought leaders shaping AI. Follow leading voices in generative AI research, LLM engineering, AI ethics, and AI entrepreneurship.";
+
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "AI Influencers", path: canonicalPath },
+  ];
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+
+  const collectionItems: ItemListEntry[] = (aiInfluencers || [])
+    .map((influencer: any, idx: number) => {
+      const slug = influencer?.name?.replace(/\s+/g, '-') || '';
+      const url = slug && influencer?.id ? `/ai-influencers/${slug}/${influencer.id}` : undefined;
+      return {
+        position: idx + 1,
+        name: influencer?.name || '',
+        url,
+        description: truncate(stripHtml(influencer?.bio || ''), 120) || undefined,
+      };
+    })
+    .filter((e: ItemListEntry) => e.name && e.url);
+
+  const collectionPageLd = buildCollectionPageLd({
+    name: "AI Influencers – Thought Leaders, Experts & Creators to Follow",
+    description: seoDescription,
+    url: buildCanonical(canonicalPath),
+    items: collectionItems,
+    breadcrumb: breadcrumbItems,
+  });
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        canonicalPath={canonicalPath}
+        type="website"
+        includeSiteInTitle={false}
+      />
+      <JsonLd id="breadcrumb-list-ai-influencers" data={breadcrumbListLd} />
+      <JsonLd id="collection-page-ai-influencers" data={collectionPageLd} />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

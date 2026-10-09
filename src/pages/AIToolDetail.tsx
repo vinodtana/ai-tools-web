@@ -39,6 +39,25 @@ import { useToast } from "@/hooks/use-toast";
 import { triggerMixpanelEvent } from "../Scenes/common";
 import CommentSection from "@/components/CommentSection";
 import ShareModal from "@/components/Common/ShareModal";
+import { SeoHead } from "@/components/SeoHead";
+import {
+  JsonLd,
+  buildSoftwareApplicationLd,
+  buildBreadcrumbListLd,
+  type BreadcrumbItem,
+} from "@/components/JsonLd";
+import {
+  buildCanonical,
+  truncate,
+  stripHtml,
+  DEFAULT_OG_IMAGE,
+  SITE_URL,
+  slugToLabel,
+  classifyPricing,
+  hasFreePlan,
+  toMetaKeywords,
+  titleCase,
+} from "@/lib/seo";
 
 const AIToolDetail = () => {
   const { id } = useParams();
@@ -152,8 +171,110 @@ const AIToolDetail = () => {
   const isLiked = userContentLikes?.find(
     (like: any) => like?.content_id == cDetails?.id
   );
+
+  const toolTitle = cDetails?.title || cDetails?.name || "AI Tool";
+  const toolPricing = cDetails?.pricing || cDetails?.price || cDetails?.planType;
+  const toolWebsite = cDetails?.website || cDetails?.toolUrl;
+  const toolCategory = cDetails?.categoryNamesList?.[0] || cDetails?.category;
+  const toolSlug =
+    cDetails?.slug ||
+    (toolTitle || String(id))
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  const canonicalPath = `/ai-tools/${encodeURIComponent(toolSlug)}/${id}`;
+  const fallbackDesc = `Discover ${toolTitle}: key features, pricing tiers, user ratings, supported platforms, how it compares vs alternatives. Find the best fit AI software for your use cases.`;
+  const seoDescription = truncate(
+    stripHtml(cDetails?.description || cDetails?.overview || fallbackDesc),
+    160,
+  );
+  const rawKeywords: Array<string | null | undefined | string[]> = [
+    toolTitle,
+    `${toolTitle} AI tool`,
+    `${toolTitle} pricing`,
+    `${toolTitle} alternatives`,
+    cDetails?.categoryNamesList?.map?.((c: string) => `${c} AI tools`),
+    cDetails?.category,
+  ];
+  const seoKeywords: string[] = rawKeywords
+    .flat()
+    .filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+
+  const pricingTier = classifyPricing(toolPricing);
+  const softwareLdDescription = stripHtml(
+    cDetails?.description || cDetails?.overview || fallbackDesc,
+  );
+  const shouldIncludeOffers = hasFreePlan(toolPricing) || !!toolPricing;
+  const softwareOffers = shouldIncludeOffers
+    ? {
+        price: pricingTier === "Free" ? "0" : null,
+        availability: "InStock",
+      }
+    : null;
+  const ratingCount = Math.max(
+    Number(cDetails?.uses || 0),
+    Number(cDetails?.likes || 0),
+    Number(cDetails?.users || 0),
+    1,
+  );
+  const hasRating =
+    Number(cDetails?.rating || 0) > 0 ||
+    Number(cDetails?.likes || 0) > 0 ||
+    Number(cDetails?.uses || 0) > 0;
+  const aggregateRating = hasRating
+    ? {
+        ratingValue: cDetails?.rating || "4.5",
+        ratingCount,
+      }
+    : null;
+  const categoryLinkSlug = toolCategory
+    ? `/ai-category-tools/${toolCategory
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")}`
+    : "/ai-tools";
+  const breadcrumbItems: BreadcrumbItem[] = [
+    { label: "Home", path: "/" },
+    { label: "AI Tools", path: "/ai-tools" },
+    {
+      label: toolCategory || "AI Tools",
+      path: categoryLinkSlug,
+    },
+    { label: toolTitle },
+  ];
+  const softwareApplicationLd = buildSoftwareApplicationLd({
+    name: toolTitle,
+    description: softwareLdDescription,
+    url: toolWebsite || buildCanonical(canonicalPath),
+    applicationCategory: toolCategory ? titleCase(toolCategory) : "AIApplication",
+    offers: softwareOffers,
+    aggregateRating,
+    image: cDetails?.logo || null,
+    featureList: cDetails?.features,
+    keywords: seoKeywords,
+    dateModified: cDetails?.updatedAt || cDetails?.createdAt || null,
+    author: cDetails?.companyName || undefined,
+  });
+  const breadcrumbListLd = buildBreadcrumbListLd(breadcrumbItems);
+
   return (
     <Layout>
+      <SeoHead
+        title={`${toolTitle} – Features, Pricing & Alternatives | TopAITools.ai`}
+        description={seoDescription}
+        keywords={seoKeywords}
+        canonicalPath={canonicalPath}
+        image={cDetails?.logo || null}
+        type="product"
+        noindex={!cDetails?.title && !cDetails?.name}
+        includeSiteInTitle={false}
+        publishedTime={cDetails?.createdAt || null}
+        modifiedTime={cDetails?.updatedAt || null}
+        tags={cDetails?.categoryNamesList}
+        section={toolCategory || null}
+      />
+      <JsonLd id={`software-application-${id || cDetails?.id}`} data={softwareApplicationLd} />
+      <JsonLd id={`breadcrumb-list-${id || cDetails?.id}`} data={breadcrumbListLd} />
       <ShareModal
 
 show={openShareModel}

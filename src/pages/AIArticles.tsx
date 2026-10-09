@@ -25,6 +25,9 @@ import {
   fetchAIArticles,
   fetchArticleCategories,
 } from "../store/features/contents/contentsSlice";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry, type BreadcrumbItem } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel, toMetaKeywords, hasFreePlan, classifyPricing } from "@/lib/seo";
 
 const AIArticles = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -79,6 +82,42 @@ const AIArticles = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title="AI Articles – Expert Guides, Tutorials & Industry Insights"
+        description="Read expert AI articles, tutorials, how-to guides and industry analysis. Learn how to use AI tools, compare LLMs, and stay updated with generative AI research and trends."
+        canonicalPath="/ai-articles"
+        type="website"
+      />
+      <JsonLd
+        id="articles-breadcrumb"
+        data={buildBreadcrumbListLd([
+          { label: "Home", path: "/" },
+          { label: "AI Articles", path: "/ai-articles" },
+        ] as BreadcrumbItem[])}
+      />
+      <JsonLd
+        id="articles-collection"
+        data={buildCollectionPageLd({
+          name: "AI Articles – Expert Guides, Tutorials & Industry Insights",
+          description: "Read expert AI articles, tutorials, how-to guides and industry analysis. Learn how to use AI tools, compare LLMs, and stay updated with generative AI research and trends.",
+          url: buildCanonical("/ai-articles"),
+          items: (aIArticles || []).map((article: any, index: number): ItemListEntry => {
+            const slug = (article?.slug || article?.name || "").toString().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+            return {
+              position: index + 1,
+              name: article?.name || "",
+              url: buildCanonical(`/ai-articles/${encodeURIComponent(slug || (article?.name || "").replace(/\s+/g, "-"))}/${article?.id || ""}`),
+              image: article?.bannerImage || article?.bannerImageTemp || article?.logo || article?.logoTemp || DEFAULT_OG_IMAGE,
+              description: truncate(stripHtml(article?.overview || article?.tagline || ""), 160),
+              type: "Article",
+            };
+          }),
+          breadcrumb: [
+            { label: "Home", path: "/" },
+            { label: "AI Articles", path: "/ai-articles" },
+          ] as BreadcrumbItem[],
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

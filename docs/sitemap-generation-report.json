@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-09T12:47:31.589Z",
+  "siteUrl": "https://www.topaitools.ai",
+  "apiBase": "https://liveapi.topaitools.ai/api",
+  "totalUrls": 371,
+  "sitemapIndex": "https://www.topaitools.ai/sitemap.xml",
+  "sitemaps": [
+    {
+      "name": "static.xml",
+      "url": "https://www.topaitools.ai/sitemaps/static.xml",
+      "count": 99
+    },
+    {
+      "name": "ai-tools.xml",
+      "url": "https://www.topaitools.ai/sitemaps/ai-tools.xml",
+      "count": 100
+    },
+    {
+      "name": "chatgpt-prompts.xml",
+      "url": "https://www.topaitools.ai/sitemaps/chatgpt-prompts.xml",
+      "count": 32
+    },
+    {
+      "name": "ai-articles.xml",
+      "url": "https://www.topaitools.ai/sitemaps/ai-articles.xml",
+      "count": 66
+    },
+    {
+      "name": "ai-news.xml",
+      "url": "https://www.topaitools.ai/sitemaps/ai-news.xml",
+      "count": 70
+    },
+    {
+      "name": "ai-influencers.xml",
+      "url": "https://www.topaitools.ai/sitemaps/ai-influencers.xml",
+      "count": 4
+    }
+  ]
+}

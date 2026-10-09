@@ -28,6 +28,9 @@ import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { fetchAITools  } from "../store/features/contents/contentsSlice";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel } from "@/lib/seo";
 
 const Categories = () => {
    const [searchTerm, setSearchTerm] = useState('');
@@ -76,8 +79,43 @@ console.log("aiCategories", aiCategories);
   item.category_name.toLowerCase().includes(searchTerm?.toLowerCase())
 ) : aiCategories;
 
+  const seoTitle = "AI Tool Categories – Browse AI Tools by Use Case & Category | TopAITools.ai";
+  const seoDesc = "Browse all AI tool categories: find best AI writing tools, coding assistants, image generators, video AI, chatbots, productivity AI, marketing AI and 50+ specialized categories curated by experts.";
+  const seoCanonical = "/categories";
+  const breadcrumbItems = [
+    { label: "Home", path: "/" },
+    { label: "Categories", path: "/categories" },
+  ];
+  const collectionItems: ItemListEntry[] = (aiCategories || [])
+    .filter((c: any) => c?.category_name)
+    .map((c: any, idx: number) => ({
+      position: idx + 1,
+      name: c.category_name,
+      url: `/categories/${(c.category_name || "").toLowerCase().replace(/\s+/g, "-")}${c.id ? "/" + c.id : ""}`,
+      description: c.description ? truncate(stripHtml(c.description), 200) : undefined,
+    }));
+
   return (
     <Layout>
+      <SeoHead
+        title={seoTitle}
+        description={seoDesc}
+        canonicalPath={seoCanonical}
+        image={DEFAULT_OG_IMAGE}
+        type="website"
+      />
+      <JsonLd id="categories-breadcrumb" data={buildBreadcrumbListLd(breadcrumbItems)} />
+      <JsonLd
+        id="categories-collection"
+        data={buildCollectionPageLd({
+          name: "AI Tool Categories",
+          description: seoDesc,
+          url: buildCanonical(seoCanonical),
+          items: collectionItems,
+          breadcrumb: breadcrumbItems,
+          image: DEFAULT_OG_IMAGE,
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { SeoHead } from "@/components/SeoHead";
 
 const NotFound = () => {
   const location = useLocation();
@@ -13,6 +14,13 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <SeoHead
+        title="404 – Page Not Found | TopAITools.ai"
+        description="The page you are looking for doesn't exist, has been moved, or is no longer available on TopAITools.ai. Return to the homepage to discover AI tools, prompts, and news."
+        noindex={true}
+        nofollow={true}
+        includeSiteInTitle={false}
+      />
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">404</h1>
         <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>

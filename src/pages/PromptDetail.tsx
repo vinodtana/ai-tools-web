@@ -30,6 +30,9 @@ import {
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildSoftwareApplicationLd, type BreadcrumbItem } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel, toMetaKeywords, hasFreePlan, classifyPricing } from "@/lib/seo";
 
 const PromptDetail = () => {
   const { id } = useParams();
@@ -77,6 +80,42 @@ const PromptDetail = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title={`${cDetails?.name || "ChatGPT Prompt"} – ChatGPT Prompt Template`}
+        description={truncate(stripHtml(cDetails?.overview || cDetails?.tagline || cDetails?.description || "Professional ChatGPT prompt template for improved productivity and creativity."), 160)}
+        canonicalPath={`/chatgpt-prompts/${encodeURIComponent((cDetails?.name || "").replace(/\s+/g, "-"))}/${id || ""}`}
+        image={cDetails?.bannerImage || cDetails?.bannerImageTemp || cDetails?.logo || cDetails?.logoTemp || DEFAULT_OG_IMAGE}
+        imageAlt={cDetails?.name || "ChatGPT Prompt Template"}
+        type="website"
+        tags={cDetails?.tags || []}
+        section={cDetails?.category || undefined}
+      />
+      <JsonLd
+        id="prompt-detail-breadcrumb"
+        data={buildBreadcrumbListLd([
+          { label: "Home", path: "/" },
+          { label: "ChatGPT Prompts", path: "/chatgpt-prompts" },
+          { label: cDetails?.name || "Prompt" },
+        ] as BreadcrumbItem[])}
+      />
+      <JsonLd
+        id="prompt-detail-software"
+        data={buildSoftwareApplicationLd({
+          name: cDetails?.name || "ChatGPT Prompt Template",
+          description: truncate(stripHtml(cDetails?.overview || cDetails?.tagline || cDetails?.description || ""), 5000),
+          url: buildCanonical(`/chatgpt-prompts/${encodeURIComponent((cDetails?.name || "").replace(/\s+/g, "-"))}/${id || ""}`),
+          applicationCategory: "ChatGPT Prompt Template",
+          operatingSystem: "Web",
+          offers: { price: "0", priceCurrency: "USD", availability: "https://schema.org/InStock" },
+          aggregateRating: cDetails?.rating ? { ratingValue: String(cDetails.rating), ratingCount: String(cDetails.uses || 1) } : null,
+          image: cDetails?.bannerImage || cDetails?.bannerImageTemp || cDetails?.logo || cDetails?.logoTemp || DEFAULT_OG_IMAGE,
+          featureList: Array.isArray(cDetails?.useCases) ? cDetails.useCases.map((uc: any) => truncate(stripHtml(typeof uc === "string" ? uc : uc?.text || ""), 200)) : [],
+          keywords: Array.isArray(cDetails?.tags) ? cDetails.tags : [cDetails?.category].filter(Boolean),
+          softwareVersion: "1.0",
+          inLanguage: "en",
+          author: "TopAITools.ai",
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8">
           {/* Main Content */}

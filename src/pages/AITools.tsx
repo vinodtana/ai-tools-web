@@ -34,6 +34,21 @@ import {
   Mic,
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import { SeoHead } from "@/components/SeoHead";
+import {
+  JsonLd,
+  buildBreadcrumbListLd,
+  buildCollectionPageLd,
+  type ItemListEntry,
+} from "@/components/JsonLd";
+import {
+  buildCanonical,
+  SITE_URL,
+  SITE_NAME,
+  slugToLabel,
+  DEFAULT_OG_IMAGE,
+  truncate,
+} from "@/lib/seo";
 import { useAppDispatch, useAppSelector } from "./../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -72,6 +87,28 @@ const AITools = () => {
     user,
     userContentLikes,
   } = useAppSelector((state: any) => state.content);
+
+  useEffect(() => {
+    const categoryLabel = category_name ? slugToLabel(category_name) : "";
+    const canonicalPath = category_name
+      ? `/ai-category-tools/${category_name}`
+      : "/ai-tools";
+
+    const seoTitle = category_name
+      ? `Best AI Tools for ${categoryLabel} – Compare & Pricing | TopAITools.ai`
+      : "3000+ AI Tools Directory – Compare Features, Pricing & Free Plans | TopAITools.ai";
+
+    const seoDescription = category_name
+      ? `Discover, compare, and review the best AI tools for ${categoryLabel}. Browse features, pricing, free plans, and user ratings. Find alternatives to popular AI tools and make informed decisions.`
+      : "Explore 3000+ curated AI tools across every category. Compare features, pricing, free plans, and user ratings. Discover the best AI tools for design, coding, marketing, sales, automation, and more.";
+
+    const keywords = category_name
+      ? [`${categoryLabel} AI tools`]
+      : [];
+
+    console.log("SEO metadata updated:", { seoTitle, canonicalPath, keywords });
+  }, [category_name, aiTools, aiToolsPagination, selectedCategory, searchQuery, currentPage]);
+
   // const { user } = useAppSelector((state: any) => state.auth);
   console.log("aiTools", aiTools);
   console.log("aiToolsPagination", aiToolsPagination);
@@ -203,8 +240,81 @@ const AITools = () => {
   const totalCategories = toolCategories.filter(
     (c: any) => c?.tool_count > 50
   ).length;
+
+  const categoryLabel = category_name ? slugToLabel(category_name) : "";
+  const canonicalPath = category_name
+    ? `/ai-category-tools/${category_name}`
+    : "/ai-tools";
+  const canonicalUrl = buildCanonical(canonicalPath);
+
+  const seoTitle = category_name
+    ? `Best AI Tools for ${categoryLabel} – Compare & Pricing | TopAITools.ai`
+    : "3000+ AI Tools Directory – Compare Features, Pricing & Free Plans | TopAITools.ai";
+
+  const seoDescription = category_name
+    ? `Discover, compare, and review the best AI tools for ${categoryLabel}. Browse features, pricing, free plans, and user ratings. Find alternatives to popular AI tools and make informed decisions.`
+    : "Explore 3000+ curated AI tools across every category. Compare features, pricing, free plans, and user ratings. Discover the best AI tools for design, coding, marketing, sales, automation, and more.";
+
+  const seoKeywords = category_name
+    ? [`${categoryLabel} AI tools`]
+    : [];
+
+  const itemListEntries: ItemListEntry[] = (aiTools || []).map(
+    (t: any, idx: number) => {
+      const rawSlug =
+        t?.slug ||
+        ((t?.title || String(t?.id || idx))
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, ""));
+      const encodedSlug = encodeURIComponent(rawSlug);
+      const toolId = String(t?.id ?? idx + 1);
+      const toolUrl = buildCanonical(`/ai-tools/${encodedSlug}/${toolId}`);
+      return {
+        position: idx + 1,
+        name: t?.title || t?.name || `AI Tool ${idx + 1}`,
+        url: toolUrl,
+        image: t?.logo || undefined,
+        description: truncate(t?.description || "", 120),
+      };
+    },
+  );
+
+  const breadcrumbItems = category_name
+    ? [
+        { label: "Home", path: "/" },
+        { label: "AI Tools", path: "/ai-tools" },
+        { label: categoryLabel, path: `/ai-category-tools/${category_name}` },
+      ]
+    : [
+        { label: "Home", path: "/" },
+        { label: "AI Tools", path: "/ai-tools" },
+      ];
+
+  const breadcrumbLd = buildBreadcrumbListLd(breadcrumbItems);
+  const collectionPageLd = buildCollectionPageLd({
+    name: seoTitle,
+    description: seoDescription,
+    url: canonicalUrl,
+    items: itemListEntries,
+    breadcrumb: breadcrumbItems,
+    image: DEFAULT_OG_IMAGE,
+  });
+
 console.log("loadingloading", loading);
   return (
+    <>
+      <SeoHead
+        title={seoTitle}
+        description={seoDescription}
+        keywords={seoKeywords}
+        canonicalPath={canonicalPath}
+        image={DEFAULT_OG_IMAGE}
+        imageAlt={seoTitle}
+        type="website"
+      />
+      <JsonLd id="aitools-breadcrumb" data={breadcrumbLd} />
+      <JsonLd id="aitools-collectionpage" data={collectionPageLd} />
     <Layout>
       <div className="container mx-auto px-4 py-8">
         {/* {loading && <Loader />} */}
@@ -413,6 +523,7 @@ console.log("loadingloading", loading);
         )}
       </div>
     </Layout>
+    </>
   );
 };
 

@@ -37,6 +37,9 @@ import {
   getAllContentLikesByUserId,
 } from "../store/features/contents/contentsSlice";
 import PromptCard from "@/components/PromtCard";
+import { SeoHead } from "@/components/SeoHead";
+import { JsonLd, buildBreadcrumbListLd, buildCollectionPageLd, type ItemListEntry, type BreadcrumbItem } from "@/components/JsonLd";
+import { buildCanonical, truncate, stripHtml, DEFAULT_OG_IMAGE, slugToLabel, toMetaKeywords, hasFreePlan, classifyPricing } from "@/lib/seo";
 
 const ChatGPTPrompts = () => {
   const navigate = useNavigate();
@@ -103,6 +106,42 @@ const ChatGPTPrompts = () => {
 
   return (
     <Layout>
+      <SeoHead
+        title="ChatGPT Prompts – 2000+ Prompt Templates for Work & Creativity"
+        description="Browse 2000+ professionally curated ChatGPT prompts for coding, writing, marketing, sales, SEO, content creation, research and productivity. Copy free prompt templates for GPT-4o, Claude and Gemini."
+        canonicalPath="/chatgpt-prompts"
+        type="website"
+      />
+      <JsonLd
+        id="prompts-breadcrumb"
+        data={buildBreadcrumbListLd([
+          { label: "Home", path: "/" },
+          { label: "ChatGPT Prompts", path: "/chatgpt-prompts" },
+        ] as BreadcrumbItem[])}
+      />
+      <JsonLd
+        id="prompts-collection"
+        data={buildCollectionPageLd({
+          name: "ChatGPT Prompts – 2000+ Prompt Templates for Work & Creativity",
+          description: "Browse 2000+ professionally curated ChatGPT prompts for coding, writing, marketing, sales, SEO, content creation, research and productivity. Copy free prompt templates for GPT-4o, Claude and Gemini.",
+          url: buildCanonical("/chatgpt-prompts"),
+          items: (aIPromots || []).map((prompt: any, index: number): ItemListEntry => {
+            const slug = (prompt?.slug || prompt?.name || "").toString().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+            return {
+              position: index + 1,
+              name: prompt?.name || "",
+              url: buildCanonical(`/chatgpt-prompts/${encodeURIComponent(slug || (prompt?.name || "").replace(/\s+/g, "-"))}/${prompt?.id || ""}`),
+              image: prompt?.bannerImage || prompt?.bannerImageTemp || prompt?.logo || prompt?.logoTemp || DEFAULT_OG_IMAGE,
+              description: truncate(stripHtml(prompt?.overview || prompt?.tagline || ""), 160),
+              type: "CreativeWork",
+            };
+          }),
+          breadcrumb: [
+            { label: "Home", path: "/" },
+            { label: "ChatGPT Prompts", path: "/chatgpt-prompts" },
+          ] as BreadcrumbItem[],
+        })}
+      />
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8 text-center">
           {/* Main Content */}

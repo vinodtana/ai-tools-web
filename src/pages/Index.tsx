@@ -21,6 +21,12 @@ import {
   Trophy,
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import SeoHead from "@/components/SeoHead";
+import JsonLd, {
+  buildOrganizationLd,
+  buildWebSiteLd,
+  buildItemListLd,
+} from "@/components/JsonLd";
 import heroImage from "@/assets/hero-light.jpg";
 import chatgptIcon from "@/assets/chatgpt-icon.jpg";
 import midjourneyIcon from "@/assets/midjourney-icon.jpg";
@@ -251,8 +257,68 @@ const Index = () => {
     },
   ];
 
+  const itemListSource = (topAITools?.length ? topAITools : aiTools) || [];
+  const itemListItems = itemListSource.slice(0, 8).map((t: any, idx: number) => {
+    const slug =
+      t.slug ||
+      t.title
+        ?.toLowerCase?.()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") ||
+      "";
+    const url = `/ai-tools/${encodeURIComponent(slug)}/${t.id}`;
+    return {
+      position: idx + 1,
+      name: t.title || t.name || "",
+      url,
+      image: t.logo || t.image || undefined,
+      description: t.description || undefined,
+    };
+  });
+
   return (
     <Layout>
+      <SeoHead
+        title="Top AI Tools – Discover the Best AI Tools for Every Task"
+        description="Discover 3000+ curated AI tools, ChatGPT prompts, AI news, expert articles, and AI influencer insights. Compare features, pricing, and alternatives to find the best AI tools for writing, coding, image generation, video creation, and productivity."
+        keywords={[
+          "AI tools directory",
+          "best AI tools",
+          "AI tool comparison",
+          "free AI tools",
+          "ChatGPT prompts",
+          "AI news",
+          "AI articles",
+          "AI influencers",
+          "AI coding tools",
+          "AI writing tools",
+          "AI image generators",
+          "TopAITools",
+        ]}
+        canonicalPath="/"
+      />
+      <JsonLd
+        id="org"
+        data={buildOrganizationLd({
+          sameAs: ["https://twitter.com/topaitools_ai"],
+        })}
+      />
+      <JsonLd
+        id="website"
+        data={buildWebSiteLd({
+          searchUrlPath: "/ai-tools",
+          searchParamName: "search",
+        })}
+      />
+      <JsonLd
+        id="itemlist"
+        data={buildItemListLd(itemListItems, {
+          name: "Top AI Tools",
+          description:
+            "Discover the best AI tools for every use case — curated and ranked.",
+          url: "/",
+        })}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden min-h-[60vh] flex items-center">
         {/* Premium Animated Background Elements */}
